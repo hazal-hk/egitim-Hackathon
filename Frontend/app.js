@@ -143,3 +143,151 @@
                     'fill-opacity': 1
                 }
             });
+            // Denizler ve okyanuslar
+            map.addSource('dunya-denizler', {
+                'type': 'geojson',
+                'data': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_marine_polys.geojson'
+            });
+
+            // Denizlerin ic dolgusu
+            map.addLayer({
+                'id': 'denizler-dolgu',
+                'type': 'fill',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'fill-color': '#003366',
+                    'fill-opacity': 0.18,
+                    'fill-opacity-transition': { duration: 1200 }
+                }
+            });
+
+            // Deniz hover dolgusu
+            map.addLayer({
+                'id': 'denizler-hover',
+                'type': 'fill',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'fill-color': '#00d4ff',
+                    'fill-opacity': 0.0,
+                    'fill-opacity-transition': { duration: 300 }
+                },
+                'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
+            });
+
+            // Secilen deniz dolgusu
+            map.addLayer({
+                'id': 'secili-deniz-dolgu',
+                'type': 'fill',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'fill-color': '#00ffff',
+                    'fill-opacity': 0.0,
+                    'fill-opacity-transition': { duration: 1200 }
+                },
+                'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
+            });
+
+            // Deniz sinirlari glow efekti
+            map.addLayer({
+                'id': 'denizler-sinir-glow',
+                'type': 'line',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'line-color': '#00aaff',
+                    'line-width': 3.0,
+                    'line-blur': 3,
+                    'line-opacity': 0.12
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                }
+            });
+
+            // Deniz ve okyanus sinir cizgileri
+            map.addLayer({
+                'id': 'denizler-sinir',
+                'type': 'line',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'line-color': '#00d4ff',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 0.6,
+                        3, 0.9,
+                        5, 1.3
+                    ],
+                    'line-dasharray': [3, 2],
+                    'line-opacity': 0.35,
+                    'line-opacity-transition': { duration: 1200 }
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                }
+            });
+
+            // secilen denize glow efekti
+            map.addLayer({
+                'id': 'secili-deniz-glow',
+                'type': 'line',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'line-color': '#00ffff',
+                    'line-width': 8.0,
+                    'line-blur': 6,
+                    'line-opacity': 0.0,
+                    'line-opacity-transition': { duration: 1000 }
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
+            });
+
+            // secilen deniz siniri glow
+            map.addLayer({
+                'id': 'secili-deniz-sinir',
+                'type': 'line',
+                'source': 'dunya-denizler',
+                'paint': {
+                    'line-color': '#00ffff',
+                    'line-width': 2.2,
+                    'line-opacity': 0.0,
+                    'line-opacity-transition': { duration: 1000 }
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
+            });
+
+            // deniz ve okyanus isimleri
+            map.addLayer({
+                'id': 'denizler-isimler',
+                'type': 'symbol',
+                'source': 'dunya-denizler',
+                'layout': {
+                    'text-field': ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Regular'],
+                    'text-size': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 9,
+                        3, 11,
+                        5, 13
+                    ],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-letter-spacing': 0.2,
+                    'text-transform': 'uppercase'
+                },
+                'paint': {
+                    'text-color': '#80e5ff',
+                    'text-opacity': 0.65,
+                    'text-opacity-transition': { duration: 1200 },
+                    'text-halo-color': 'rgba(0, 10, 25, 0.85)',
+                    'text-halo-width': 1.8
+                }
+            });
