@@ -117,6 +117,24 @@ def get_country_info(country_name):
             
     return data
 
+    # 4. KUSURSUZ AĞAÇ (TREE) YAPISI
+    # Artık verileri düz değil, dallanıp budaklanacak şekilde paketliyoruz
+    data["tree"] = {
+        "Coğrafya": {
+            "Genel": cografya if cografya else f"{country_name} eşsiz bir coğrafyaya sahiptir.",
+            "Fiziki (Dağlar ve Nehirler)": fiziki.strip() if fiziki.strip() else f"{country_name} dağlar ve göllerden oluşan zengin bir fiziki yapıya sahiptir."
+        },
+        "Kültür": {
+            "Genel Gelenekler": kultur if kultur else f"{country_name} zengin gelenekleriyle bilinir.",
+            "Yemekler (Mutfak)": yemekler if yemekler else f"{country_name} mutfağı çok lezzetlidir."
+        },
+        "Tarih": {
+            "Kısa Tarihçe": tarih if tarih else f"{country_name} köklü bir tarihe sahiptir."
+        }
+    }
+            
+    return data
+
 def run_auto_seeder():
     db = mysql.connector.connect(
         host=os.getenv("DB_HOST"), port=os.getenv("DB_PORT"),
@@ -128,6 +146,7 @@ def run_auto_seeder():
     for c_name in HACKATHON_COUNTRIES:
         info = get_country_info(c_name)
         
+        # 1. Ülkeyi Ekle/Bul
         cursor.execute("SELECT id FROM countries WHERE name = %s", (info["name"],))
         result = cursor.fetchone()
         
@@ -140,29 +159,44 @@ def run_auto_seeder():
         else:
             country_id = result[0]
 
-        for cat_name, content in info["categories"].items():
-            cursor.execute("SELECT id FROM categories WHERE name = %s", (cat_name,))
-            cat_result = cursor.fetchone()
+        # 2. AĞAÇ MİMARİSİNİ VERİTABANINA İŞLEME
+        for main_cat_name, sub_categories in info["tree"].items():
             
-            if not cat_result:
-                cursor.execute("INSERT INTO categories (name) VALUES (%s)", (cat_name,))
-                cat_id = cursor.lastrowid
+            # 2A. Ana Kategoriyi Bul veya Yarat (parent_id = NULL olanlar)
+            cursor.execute("SELECT id FROM categories WHERE name = %s AND parent_id IS NULL", (main_cat_name,))
+            main_cat_result = cursor.fetchone()
+            
+            if not main_cat_result:
+                cursor.execute("INSERT INTO categories (name, parent_id) VALUES (%s, NULL)", (main_cat_name,))
+                main_cat_id = cursor.lastrowid
             else:
-                cat_id = cat_result[0]
+                main_cat_id = main_cat_result[0]
                 
-            cursor.execute(
-                """INSERT INTO country_contents (country_id, category_id, content_text) 
-                   VALUES (%s, %s, %s) 
-                   ON DUPLICATE KEY UPDATE content_text = VALUES(content_text)""",
-                (country_id, cat_id, content)
-            )
+            # 2B. Alt Kategorileri Ana Kategoriye Bağla ve İçeriği Ekle
+            for sub_cat_name, content in sub_categories.items():
+                cursor.execute("SELECT id FROM categories WHERE name = %s AND parent_id = %s", (sub_cat_name, main_cat_id))
+                sub_cat_result = cursor.fetchone()
+                
+                if not sub_cat_result:
+                    cursor.execute("INSERT INTO categories (name, parent_id) VALUES (%s, %s)", (sub_cat_name, main_cat_id))
+                    sub_cat_id = cursor.lastrowid
+                else:
+                    sub_cat_id = sub_cat_result[0]
+                    
+                # 2C. İçeriği tam olarak Alt Kategorinin içine yaz!
+                cursor.execute(
+                    """INSERT INTO country_contents (country_id, category_id, content_text) 
+                       VALUES (%s, %s, %s) 
+                       ON DUPLICATE KEY UPDATE content_text = VALUES(content_text)""",
+                    (country_id, sub_cat_id, content)
+                )
         
         db.commit()
-        print(f"✅ {c_name} veritabanına sorunsuz yazıldı!")
+        print(f"✅ {c_name} hiyerarşik (ağaç) mimariyle veritabanına yazıldı!")
 
     cursor.close()
     db.close()
-    print("\n🎉 İŞLEM TAMAM! 1.5 SANİYELİK MOLALARLA DUVAR AŞILDI, VERİLER YAZILDI.")
+    print("\n🎉 İŞLEM TAMAM! 3 BOYUTLU VERİTABANI MİMARİSİ AKTİF.")
 
 if __name__ == "__main__":
     run_auto_seeder()
