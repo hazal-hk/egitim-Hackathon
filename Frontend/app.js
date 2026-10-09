@@ -1560,3 +1560,130 @@
                 mainContainer.style.display = 'grid';
             });
         }
+// ═══════ HEDEF KONUM TARAMASI (GEOLOCATION) ═══════
+const scanBtn = document.getElementById('btn-scan-location');
+let userMarker = null;
+let fadeOutTimeout = null; // İşaretçinin kaybolma zamanlayıcısını hafızada tutar
+
+if (scanBtn) {
+    scanBtn.addEventListener('click', () => {
+        // Tarayıcı desteği kontrolü
+        if (!navigator.geolocation) {
+            scanBtn.textContent = "[ SİSTEM HATASI ]";
+            return;
+        }
+
+        // Arayüzü tarama (scanning) moduna al
+        scanBtn.textContent = "[ TARANIYOR... ]";
+        scanBtn.classList.add('scanning');
+        
+        const statStatus = document.getElementById('stat-status');
+        if (statStatus) statStatus.textContent = 'TARAMA AKTİF';
+
+        // Konum verisini çek
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lng = position.coords.longitude;
+                const lat = position.coords.latitude;
+
+                // Eğer aktif bir ülke dönüşü (orbit) varsa onu durdur
+                if (typeof stopCountryOrbit === 'function') stopCountryOrbit();
+
+                // Haritayı kamerasıyla birlikte dramatik şekilde uçur
+                map.flyTo({
+                    center: [lng, lat],
+                    zoom: 14,
+                    pitch: 60,
+                    bearing: 30, // Hafif açılı siberpunk girişi
+                    speed: 1.2,
+                    curve: 1,
+                    essential: true
+                });
+
+                // ═════ GHOST MARKER TEMİZLİK VE ZAMANLAYICI SIFIRLAMA ═════
+                // Eğer önceki bir işaretçi varsa veya hala ekranda duruyorsa onu yok et
+                if (userMarker) {
+                    userMarker.remove();
+                    userMarker = null;
+                }
+                document.querySelectorAll('.user-marker-container').forEach(el => el.remove());
+
+                // Eğer işaretçi daha kaybolmadan tekrar butona basıldıysa süreyi sıfırla
+                if (fadeOutTimeout) {
+                    clearTimeout(fadeOutTimeout);
+                    fadeOutTimeout = null;
+                }
+
+                // 1. Kapsayıcı (container) div oluştur
+                const markerContainer = document.createElement('div');
+                markerContainer.className = 'user-marker-container';
+
+                // 2. Siberpunk GPS Etiketi
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'cyber-gps-label';
+                labelDiv.textContent = '[ GPS LOCK ]';
+
+                // 3. CSS Elmas/Hedef İğnesi
+                const pointerDiv = document.createElement('div');
+                pointerDiv.className = 'cyber-gps-pointer';
+
+                // 4. Parazitsiz, Kenarı Parlayan Radar Dairesi (Ping)
+                const pingDiv = document.createElement('div');
+                pingDiv.className = 'user-ping';
+
+                // 5. Parçaları kapsayıcıya ekle
+                markerContainer.appendChild(labelDiv);
+                markerContainer.appendChild(pointerDiv);
+                markerContainer.appendChild(pingDiv);
+
+                // 6. İşaretleyiciyi haritaya ekle
+                userMarker = new mapboxgl.Marker({ 
+                    element: markerContainer,
+                    anchor: 'center' // Konumun tam merkezini kilitler
+                })
+                .setLngLat([lng, lat])
+                .addTo(map);
+
+                // Kameranın inişi bitmeye yakın HUD metinlerini güncelle
+                setTimeout(() => {
+                    scanBtn.textContent = "[ HEDEF BULUNDU ]";
+                    scanBtn.classList.remove('scanning');
+                    if (statStatus) statStatus.textContent = 'HEDEF KİLİTLENDİ';
+                    
+                    // Butonu ilk haline getir
+                    setTimeout(() => {
+                        scanBtn.textContent = "[ KONUM TARAMASI ]";
+                    }, 4000);
+                }, 1500);
+
+                // ═════ 10 SANİYE SONRA YAVAŞÇA KAYBOLMA GÖREVİ ═════
+                fadeOutTimeout = setTimeout(() => {
+                    if (markerContainer) {
+                        // İşaretçiye 1.5 saniyede şeffaflaşma (fade-out) efektini ver
+                        markerContainer.classList.add('fade-out-marker');
+                        
+                        // Efekt bittikten sonra (1.5 sn = 1500ms) haritadan tamamen sil (Garbage Collection)
+                        setTimeout(() => {
+                            if (userMarker) {
+                                userMarker.remove();
+                                userMarker = null;
+                            }
+                        }, 1500);
+                    }
+                }, 10000); // Tıklamadan itibaren 10 saniye bekle
+            },
+            (error) => {
+                // Kullanıcı konum izni vermezse veya veri çekilemezse
+                scanBtn.textContent = "[ SİNYAL KAYBI ]";
+                scanBtn.classList.remove('scanning');
+                if (statStatus) statStatus.textContent = 'BAĞLANTI KOPTU';
+                
+                setTimeout(() => {
+                    scanBtn.textContent = "[ KONUM TARAMASI ]";
+                }, 3000);
+            },
+            // Yüksek doğrulukta GPS verisi iste
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    });
+}
