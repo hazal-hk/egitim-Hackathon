@@ -1,0 +1,18 @@
+{
+  "country": "Japonya",
+  "lat": 36.2048,
+  "lng": 138.2529,
+  "zoom": 4.5,
+  "categories": [
+    {
+      "id": 1,
+      "name": "Kültür",
+      "sub_categories": [
+        {
+          "name": "Yemekler",
+          "content": "Japon mutfaginin temeli pirinç, miso çorbasi ve mevsimsel malzemelere dayanır."
+        }
+      ]
+    }
+  ]
+}

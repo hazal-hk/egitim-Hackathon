@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dünya 3D Topografik Hologram Haritası - İnteraktif küresel keşif deneyimi">
+    <title>Dünya 3D Topografik Hologram</title>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Oxanium:wght@500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Yukleme ekrani -->
+    <div class="yukleme-ekrani" id="yukleme-ekrani">
+        <div class="Yukleme-icerik">
+            <div class="Yukleme-yazi yukleme-marka">GeoFlight</div>
+            <div class="Yukleme-hex"></div>
+            <div class="Yukleme-bar-container">
+                <div class="Yukleme-bar" id="Yukleme-bar"></div>
+            </div>
+            <div class="yukleme-baslat">Başlamak için tıklayınız</div>
+            <div class="yukleme-ekip">
+                <div>Hazal Karayiğit</div>
+                <div>Alper Tunga Amirahmadov</div>
+                <div>Ali Berk Bacaksız</div>
+            </div>
+        </div>
+    </div>
+
+<!-- Map -->
+ <div id='harita'></div>
+
+<!-- Scanline katman -->
+ <div class="scanlines"></div>
+
+ <!-- Partikuller -->
+  <div class="partikul-container" id="partikuller"></div>
+
+<!--Kose parantezleri-->
+    <div class="corner-bracket corner-tl"></div>
+    <div class="corner-bracket corner-tr"></div>
+    <div class="corner-bracket corner-bl"></div>
+    <div class="corner-bracket corner-br"></div>
+<!-- Yukari HUD -->
+ <div class="hud-yukari">
+    <div class="hud-logo">
+        <div class="hud-logo-icon"></div>
+        <span class="hud-logo-text">GeoFlight</span>
+    </div>  
+    <div class="hud-durum">
+        <div class="hud-durum-item" id="hud-zaman">--:--:--</div>
+    </div>  
+ </div>
+ <!-- Orta Hud-->
+<div class = "hud-orta">
+    <div class="hud-kordinatlar" id="hud-kordinatlar">LAT 0.0000 · LNG 0.0000</div>
+</div>
+
+<!--Pusula-->
+<div class="pusula" role="img" aria-label="Pusula">
+    <span class="compass-cardinal compass-north">N</span>
+    <span class="compass-cardinal compass-east">E</span>
+    <span class="compass-cardinal compass-south">S</span>
+    <span class="compass-cardinal compass-west">W</span>
+    <div class="compass-needle" id="compass-needle"></div>
+    <div class="compass-pivot"></div>
+</div>
+
+<!-- Hover Tooltip -->
+ <div class="hover-tooltip" id="hover-tooltip"></div>
+ <!--Hologram bilgi kart-->
+ <div id="hologram-kart" class = "hologram-kart">
+    <div class="kart-parlama-cizgisi"></div>
+    <button class="kart-kapat" id="kart-kapat" title="Kapat">✕</button>
+    <div class="kart-header">
+        <div class="kart-tag">Dünya Haritası</div>
+        <h2 class="kart-baslik" id="ulke-adi">--</h2>
+        <div class="kart-altyazi" id="kart-altyazi">// BÖLGE VERİSİ YÜKLENİYOR...</div>
+    </div>
+    <div class="kart-body">
+        <div class="kart-terminal" id="ulke-bilgi">
+            <div id="ulke-bilgi-icerik"></div>
+        </div>
+    </div>
+    <div class="card-footer">
+            <div class="stat-box">
+                <div class="stat-label">Sinyal</div>
+                <div class="stat-value" id="stat-signal">--</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Tehdit</div>
+                <div class="stat-value" id="stat-threat">--</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Durum</div>
+                <div class="stat-value" id="stat-status">--</div>
+            </div>
+        </div>
+    </div>
+     <script src="app.js"></script>
+</body>
+
+</html>
