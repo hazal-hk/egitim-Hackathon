@@ -72,7 +72,6 @@ def get_country_info(country_name):
         if res.status_code == 200:
             rj = res.json()
             if isinstance(rj, list) and rj:
-                # birden fazla eşleşmede Türkçe adı tam tutanı seç
                 match = next(
                     (c for c in rj
                      if c.get("translations", {}).get("tur", {}).get("common") == country_name),
@@ -89,26 +88,27 @@ def get_country_info(country_name):
         data["img2"] = wiki_img
 
     # 3. Metinler
-    print("   - Genel coğrafya...")
+    print("   - Coğrafya...")
     cografya = get_safe_wiki(f"{country_name} coğrafyası")
-
-    print("   - Fiziki coğrafya...")
     dag = get_safe_wiki(f"{country_name} dağları")
     nehir = get_safe_wiki(f"{country_name} nehirleri")
     fiziki = " ".join(p for p in (dag, nehir) if p)
 
+    print("   - Kültür...")
+    kultur = get_safe_wiki(f"{country_name} kültürü")
+    yemekler = get_safe_wiki(f"{country_name} mutfağı")
+
     print("   - Tarih...")
     tarih = get_safe_wiki(f"{country_name} tarihi")
 
-    print("   - Kültür...")
-    kultur = get_safe_wiki(f"{country_name} kültürü")
+    print("   - Ekonomi...")
+    ekonomi = get_safe_wiki(f"{country_name} ekonomisi")
+    tarim = get_safe_wiki(f"{country_name} tarımı")
+    sanayi = get_safe_wiki(f"{country_name} sanayisi")
+    sektorler = " ".join(p for p in (tarim, sanayi) if p)
 
-    print("   - Mutfak...")
-    yemekler = get_safe_wiki(f"{country_name} mutfağı")
-
-    # Ana özet sadece bir şey eksikse çekilir (lazy fallback)
     main_summary = None
-    if not all((cografya, fiziki, tarih, kultur, yemekler)):
+    if not all((cografya, fiziki, kultur, yemekler, tarih, ekonomi, sektorler)):
         main_summary = get_safe_wiki(country_name)
 
     data["tree"] = {
@@ -122,6 +122,10 @@ def get_country_info(country_name):
         },
         "Tarih": {
             "Genel Tarih": tarih or main_summary or f"{country_name} köklü bir tarihe sahiptir.",
+        },
+        "Ekonomi": {
+            "Genel Ekonomi": ekonomi or main_summary or f"{country_name} çeşitli sektörlere dayanan bir ekonomiye sahiptir.",
+            "Tarım ve Sanayi": sektorler or f"{country_name} ekonomisinde tarım ve sanayi önemli yer tutar.",
         },
     }
 
