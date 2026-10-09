@@ -137,7 +137,7 @@ def ensure_categories(cur):
 
 
 def seed_country(cur, db, name, cat_ids, force):
-    cur.execute("SELECT id FROM countries WHERE name=%s", (name,))
+    cur.execute("SELECT id, iso_code FROM countries WHERE name=%s", (name,))
     row = cur.fetchone()
     if row and not force:
         cur.execute("SELECT COUNT(*) FROM country_contents WHERE country_id=%s", (row[0],))
@@ -147,17 +147,17 @@ def seed_country(cur, db, name, cat_ids, force):
 
     print(f"\n🚀 {name}")
     used = set()                                              # fonksiyonun başına, print(f"\n🚀 ...")'ın altına
-    iso, flag = rest_countries(name)
+    iso = row[1] if row else None
+    flag = flag_url(iso) if iso else None
     main_page = wiki(name, name, main=True)                   # eski wiki(name, name) yerine    img = (main_page or {}).get("thumbnail", {}).get("source")
     summary = trim_text(main_page["extract"].strip()) if main_page else None
 
     if row:
         country_id = row[0]
         cur.execute(
-            """UPDATE countries SET iso_code=COALESCE(%s, iso_code),
-               image_1_url=COALESCE(%s, image_1_url), image_2_url=COALESCE(%s, image_2_url)
-               WHERE id=%s""",
-            (iso, flag, img, country_id))
+            """UPDATE countries SET image_1_url=COALESCE(%s, image_1_url),
+            image_2_url=COALESCE(%s, image_2_url) WHERE id=%s""",
+            (flag, img, country_id))
     else:
         cur.execute(
             "INSERT INTO countries (name, iso_code, image_1_url, image_2_url) VALUES (%s,%s,%s,%s)",
