@@ -26,29 +26,49 @@
 
         // ═══════ LOADING SIMULATION ═══════
         let loadProgress = 0;
+        let isReadyToShow = false;
         const loadingScreen = document.getElementById('loading-screen');
-        const loadInterval = setInterval(() => {
-            loadProgress += Math.random() * 15 + 5;
-            if (loadProgress > 100) loadProgress = 100;
-            document.getElementById('loading-bar').style.width = loadProgress + '%';
-            if (loadProgress >= 100) {
-                clearInterval(loadInterval);
-                const showStartPrompt = () => {
-                    setTimeout(() => loadingScreen.classList.add('ready'), 600);
-                };
+        const loadingBar = document.getElementById('loading-bar');
 
-                if (map.loaded()) {
-                    showStartPrompt();
-                } else {
-                    map.once('idle', showStartPrompt);
-                }
+        const markReady = () => {
+            if (isReadyToShow) return;
+            isReadyToShow = true;
+            if (loadingBar) loadingBar.style.width = '100%';
+            if (loadingScreen) {
+                loadingScreen.classList.add('ready');
             }
-        }, 200);
+        };
 
-        loadingScreen.addEventListener('click', (event) => {
-            if (!loadingScreen.classList.contains('ready') || event.button !== 0) return;
-            loadingScreen.classList.add('hidden');
-        });
+        const loadInterval = setInterval(() => {
+            loadProgress += Math.random() * 18 + 10;
+            if (loadProgress >= 100) {
+                loadProgress = 100;
+                clearInterval(loadInterval);
+                if (loadingBar) loadingBar.style.width = '100%';
+
+                // Harita durumuna göre veya güvenlik zaman aşımıyla hazır duruma getir
+                if (typeof map !== 'undefined' && map && typeof map.loaded === 'function' && map.loaded()) {
+                    setTimeout(markReady, 300);
+                } else if (typeof map !== 'undefined' && map && typeof map.once === 'function') {
+                    map.once('load', () => setTimeout(markReady, 200));
+                    map.once('idle', () => setTimeout(markReady, 200));
+                    setTimeout(markReady, 800); // Harita arka plan yüklemesi uzasa bile asla takılı kalmaz
+                } else {
+                    setTimeout(markReady, 400);
+                }
+            } else if (loadingBar) {
+                loadingBar.style.width = loadProgress + '%';
+            }
+        }, 100);
+
+        if (loadingScreen) {
+            loadingScreen.addEventListener('click', (event) => {
+                if (event.button !== 0) return;
+                if (loadProgress >= 100 || loadingScreen.classList.contains('ready')) {
+                    loadingScreen.classList.add('hidden');
+                }
+            });
+        }
 
         // ═══════ MAP INIT ═══════
         mapboxgl.accessToken = 'pk.eyJ1IjoiYWxwZXJpdHRvNSIsImEiOiJjbXV4ZzZ4d3gwOTh3MnhzZmgxNmUwOGpvIn0.Izv0zJRodMPyWUY2CrB_SQ';
@@ -534,8 +554,20 @@
         // ═══════ TYPEWRITER EFFECT ═══════
         let yazmaAnimasyonu;
 
+        function getTerminalTemplateElement(elementId = 'country-info') {
+            let templateElement = document.getElementById(`${elementId}-template`);
+            if (!templateElement) {
+                const parent = document.getElementById(elementId);
+                if (parent) {
+                    parent.innerHTML = `<div id="${elementId}-template"></div>`;
+                    templateElement = document.getElementById(`${elementId}-template`);
+                }
+            }
+            return templateElement;
+        }
+
         function daktiloYaz(sablon, metinler, elementId, hiz) {
-            const templateElement = document.getElementById(`${elementId}-template`);
+            const templateElement = getTerminalTemplateElement(elementId);
             if (!templateElement) return;
 
             templateElement.innerHTML = sablon;
@@ -960,6 +992,15 @@
             stopCountryOrbit();
         }
 
+        function resetCardButtons() {
+            const main = document.getElementById('main-buttons-container');
+            const sub = document.getElementById('sub-buttons-container');
+            const dynamic = document.getElementById('dynamic-sub-buttons');
+            if (sub) sub.style.display = 'none';
+            if (main) main.style.display = 'grid';
+            if (dynamic) dynamic.innerHTML = '';
+        }
+
         function startCountryOrbit(center, zoom = map.getZoom()) {
             if (!center) return;
 
@@ -1059,6 +1100,20 @@
             lastFocusedCountryName = ulkeAdi;
             map.setPaintProperty('secili-ulke-isim', 'text-opacity-transition', { duration: 0 });
             map.setPaintProperty('secili-ulke-isim', 'text-opacity', 0);
+
+            // Önceki daktilo animasyonunu durdur, kart butonlarını ana menüye getir
+            clearInterval(yazmaAnimasyonu);
+            resetCardButtons();
+
+            // Önceki ülkenin bilgilerini hemen temizle ve yeni ülke bağlantısını başlat
+            const countryNameEl = document.getElementById('country-name');
+            if (countryNameEl) countryNameEl.textContent = ulkeGorunenAdi;
+            const cardSubtitleEl = document.getElementById('card-subtitle');
+            if (cardSubtitleEl) cardSubtitleEl.textContent = `// BÖLGE: ${ulkeGorunenAdi.toLocaleUpperCase('tr-TR')} · BAĞLANTI KURULUYOR...`;
+            const templateEl = getTerminalTemplateElement('country-info');
+            if (templateEl) {
+                templateEl.innerHTML = `<span class="prompt">&gt;</span> UYDU BAĞLANTISI YÖNLENDİRİLİYOR: <span class="highlight">${ulkeGorunenAdi}</span>...`;
+            }
 
             // Deniz vurgularını temizle
             map.setFilter('secili-deniz-dolgu', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
@@ -1168,6 +1223,7 @@
                 kart.classList.remove('sea-mode');
                 kart.classList.add('show');
                 randomStats();
+                resetCardButtons();
 
                 const orbitKey = getOrbitKey(orbitCenter, finalZoom);
                 const sameTarget = countryOrbitState.active && countryOrbitState.key === orbitKey;
@@ -1188,6 +1244,7 @@
                     'Seçilen bölgenin stratejik, coğrafi ve eğitim verileri yükleniyor...'
                 ];
                 setTimeout(() => {
+                    if (selectionToken !== countrySelectionToken) return;
                     daktiloYaz(ornekSablon, ornekIcerik, 'country-info', 25);
                 }, 400);
             });
@@ -1198,6 +1255,7 @@
             const seaInfo = getStaticSeaInformation(feature);
             const seaName = seaInfo.displayName;
             clearInterval(yazmaAnimasyonu);
+            resetCardButtons();
 
             stopCountryOrbit();
 
@@ -1442,8 +1500,15 @@
             });
 
             document.getElementById('hologram-card').classList.remove('show', 'sea-mode');
+            resetCardButtons();
             setTimeout(() => {
-                document.getElementById('country-info-template').innerHTML = '';
+                const templateEl = document.getElementById('country-info-template');
+                if (templateEl) {
+                    templateEl.innerHTML = '';
+                } else {
+                    const infoParent = document.getElementById('country-info');
+                    if (infoParent) infoParent.innerHTML = '<div id="country-info-template"></div>';
+                }
             }, 600);
         }
 // Alt kategori başlıkları ve içerikleri (Sizin özelleştirdiğiniz liste)
@@ -1452,6 +1517,16 @@ const subCategories = {
     culture: ["Gelenekler", "Yemekler"],
     history: ["Genel Tarih"],
     economy: ["Genel Ekonomi", "Tarım ve Sanayi"]
+};
+
+const subCategoryDescriptions = {
+    "Genel Coğrafya": "coğrafi konumu, bölgeleri ve yer şekilleri verileri aktarılıyor...",
+    "Fiziki Coğrafya": "fiziki yeryüzü şekilleri, dağları ve su kaynakları inceleniyor...",
+    "Gelenekler": "kültürel mirası, gelenekleri ve toplumsal yaşam verileri taranıyor...",
+    "Yemekler": "geleneksel mutfağı ve gastronomi kültürü yükleniyor...",
+    "Genel Tarih": "tarihi geçmişi, önemli dönemleri ve arşiv kayıtları getiriliyor...",
+    "Genel Ekonomi": "temel ekonomik göstergeleri, ticaret ve pazar verileri aktarılıyor...",
+    "Tarım ve Sanayi": "üretim kapasitesi, sanayi ve tarımsal göstergeleri listeleniyor..."
 };
 
 const mainContainer = document.getElementById('main-buttons-container');
@@ -1473,23 +1548,24 @@ document.querySelectorAll('.category-btn').forEach(btn => {
             subBtn.innerHTML = `
                 <div class="stat-value">${subItem}</div>
             `;
-            
+
             // Alt butona tıklandığında bilgi gösterme
             subBtn.addEventListener('click', () => {
-                // Eğer devam eden bir daktilo animasyonu varsa onu durdur
+                // Devam eden daktilo animasyonunu durdur
                 if (typeof yazmaAnimasyonu !== 'undefined') {
                     clearInterval(yazmaAnimasyonu);
                 }
 
                 const activeCountry = document.getElementById('country-name').textContent;
-                const infoTemplate = '<span class="prompt">&gt;</span> <span data-text-slot></span>';
-                
-                // Projenizde daktilo efekti varsa ve infoText tanımlıysa çalışır, aksi takdirde direkt yazdırır
-                if (typeof daktiloYaz === 'function' && typeof infoText !== 'undefined') {
-                    daktiloYaz(infoTemplate, infoText, 'country-info', 12);
-                } else {
-                    document.getElementById('country-info').innerHTML = `> ${activeCountry}<br>${subItem}: `;
-                }
+                const desc = subCategoryDescriptions[subItem] || `${subItem} verileri taranıyor...`;
+                const infoTemplate = '<span class="prompt">&gt;</span> <span data-text-slot></span><br><br><span class="prompt">&gt;</span> <span class="highlight" data-text-slot></span>: <span data-text-slot></span>';
+                const infoText = [
+                    `BÖLGE: ${activeCountry}`,
+                    subItem,
+                    desc
+                ];
+
+                daktiloYaz(infoTemplate, infoText, 'country-info', 15);
             });
 
             dynamicSubButtons.appendChild(subBtn);
@@ -1504,7 +1580,6 @@ document.querySelectorAll('.category-btn').forEach(btn => {
 // 2. "Geri Dön" butonuna tıklama olayı (Ana menüye dönüş)
 if (backButton) {
     backButton.addEventListener('click', () => {
-        subContainer.style.display = 'none';
-        mainContainer.style.display = 'grid';
+        resetCardButtons();
     });
 }
