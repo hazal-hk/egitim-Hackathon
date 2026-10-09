@@ -1,35 +1,61 @@
 import mysql.connector
 import os
 import requests
-import wikipedia
 from dotenv import load_dotenv
 import time
 
 load_dotenv()
-wikipedia.set_lang("tr")
-# Wikipedia güvenlik duvarını aşmak için bot olmadığımızı kanıtlıyoruz:
-wikipedia.set_user_agent("WorldEduHackathon/1.0 (Student Project)")
-
 HACKATHON_COUNTRIES = ["Türkiye", "Japonya", "Mısır", "İtalya", "Brezilya"]
 
-def get_safe_wiki(query):
+def get_safe_wiki(query, get_image=False):
+    # Wikimedia kuralları gereği robot olmadığımızı ve öğrenci projesi olduğumuzu mail ile kanıtlıyoruz
+    headers = {"User-Agent": "WorldEduHackathonBot/1.0 (hazal.karayigit@ktu.edu.tr)"}
+    
+    # GÜVENLİK DUVARI İÇİN KRİTİK NOKTA: Her istekten önce 1.5 saniye nefes al!
+    time.sleep(1.5)
+    
     try:
-        # Wikipedia IP'mizi bloklamasın diye her istekte 1.5 saniye bekliyoruz
-        time.sleep(1.5) 
-        return wikipedia.summary(query, sentences=2, auto_suggest=True)
-    except wikipedia.exceptions.DisambiguationError as e:
-        # Eğer Wikipedia "Hangisini kastettin?" derse, doğrudan ilkini al
-        try:
-            time.sleep(1)
-            return wikipedia.summary(e.options[0], sentences=2, auto_suggest=False)
-        except Exception:
-            return None
+        # URL hatalarını (boşluk, Türkçe karakter) önlemek için requests'in params özelliğini kullanıyoruz
+        search_url = "https://tr.wikipedia.org/w/api.php"
+        search_params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "utf8": "",
+            "format": "json"
+        }
+        search_res = requests.get(search_url, params=search_params, headers=headers, timeout=5)
+        
+        if search_res.status_code == 200:
+            search_data = search_res.json()
+            if search_data.get("query", {}).get("search"):
+                # En doğru sayfa başlığını bulduk
+                best_title = search_data["query"]["search"][0]["title"]
+                
+                # Sayfa içeriğini çekmeden önce tekrar 1.5 saniye dinleniyoruz
+                time.sleep(1.5)
+                
+                # Boşlukları alt tireye çevirip REST API'ye yolluyoruz
+                summary_url = f"https://tr.wikipedia.org/api/rest_v1/page/summary/{best_title.replace(' ', '_')}"
+                summary_res = requests.get(summary_url, headers=headers, timeout=5)
+                
+                if summary_res.status_code == 200:
+                    summary_data = summary_res.json()
+                    
+                    if get_image:
+                        return summary_data.get("thumbnail", {}).get("source")
+                        
+                    extract = summary_data.get("extract", "")
+                    if extract:
+                        sentences = extract.split(". ")
+                        return ". ".join(sentences[:2]) + "."
     except Exception as e:
-        print(f"      -> Uyarı: '{query}' Wikipedia'dan reddedildi. ({type(e).__name__})")
-        return None
+        print(f"      -> Uyarı: '{query}' API bağlantısında hata: {e}")
+        
+    return None
 
 def get_country_info(country_name):
-    print(f"\n🛡️ {country_name} için Vikipedi DDOS koruması aşılarak veri çekiliyor...")
+    print(f"\n🚀 {country_name} için Resmi Wikipedia API'sine yavaş ve güvenli bağlanılıyor...")
     
     data = {
         "name": country_name, 
@@ -39,7 +65,7 @@ def get_country_info(country_name):
         "categories": {}
     }
     
-    # 1. REST Countries
+    # 1. REST Countries (Bayrak ve ISO)
     try:
         res = requests.get(f"https://restcountries.com/v3.1/translation/{country_name}", timeout=5)
         if res.status_code == 200:
@@ -51,18 +77,11 @@ def get_country_info(country_name):
         pass
 
     # 2. Wikipedia Görsel
-    try:
-        time.sleep(1)
-        page = wikipedia.page(country_name, auto_suggest=True)
-        if len(page.images) > 0:
-            for img in page.images:
-                if img.endswith(('.jpg', '.png')) and "flag" not in img.lower():
-                    data["img2"] = img
-                    break
-    except Exception:
-        pass
+    wiki_img = get_safe_wiki(country_name, get_image=True)
+    if wiki_img:
+        data["img2"] = wiki_img
 
-    # 3. YAVAŞ VE ZIRHLI METİN ÇEKİMİ
+    # 3. KUSURSUZ METİN ÇEKİMİ
     print("   - Tarih bilgisi alınıyor...")
     tarih = get_safe_wiki(f"{country_name} tarihi")
     
@@ -72,7 +91,6 @@ def get_country_info(country_name):
     print("   - Kültür bilgisi alınıyor...")
     kultur = get_safe_wiki(f"{country_name} kültürü")
 
-    # Eğer bir kategori yine de reddedilirse ana ülkenin giriş metnini can simidi olarak al
     main_summary = None
     if not kultur or not cografya or not tarih:
         main_summary = get_safe_wiki(country_name)
@@ -128,7 +146,7 @@ def run_auto_seeder():
 
     cursor.close()
     db.close()
-    print("\n🎉 İŞLEM TAMAM! GÜVENLİK DUVARI AŞILDI, GERÇEK VERİLER AKTİF.")
+    print("\n🎉 İŞLEM TAMAM! 1.5 SANİYELİK MOLALARLA DUVAR AŞILDI, VERİLER YAZILDI.")
 
 if __name__ == "__main__":
     run_auto_seeder()
