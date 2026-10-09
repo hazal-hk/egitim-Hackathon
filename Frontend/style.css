@@ -216,3 +216,141 @@
             width: 2px;
             height: 24px;
         }
+
+        /*-- scan line katman -- */
+
+        .scanlines{
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 12;
+             background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 255, 0.015) 2px,
+                    rgba(0, 255, 255, 0.015) 4px);
+            animation: scanline-shift 8s linear infinite;
+        }
+        
+        .pusula{
+            position: absolute;
+            bottom: 24px;
+            left:24px;
+            width:100px;
+            border: 1px solid rgba(0,255,255,0.32);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 28, 42, 0.76), rgba(2, 8, 20, 0.58) 72%);
+            box-shadow: 0 0 14px rgba(0, 255, 255, 0.12), inset 0 0 12px rgba(0, 255, 255, 0.08);
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .pusula::before{
+            content: '';
+            position:absolute;
+            inset: 7px;
+            border: 1px solid rgba(0,255,255,0.2);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .pusula::after{
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius:50%;
+             background: repeating-conic-gradient(rgba(0, 255, 255, 0.6) 0deg 1deg, transparent 1deg 15deg);
+            mask: radial-gradient(circle, transparent 0 68%, #000 69% 73%, transparent 74%);
+            opacity: 0.72;
+            z-index: 1;
+        }
+        .pusula-cardinal {
+            position: absolute;
+            z-index: 2;
+            color: rgba(170, 245, 255, 0.72);
+            font: 9px 'Share Tech Mono', monospace;
+            line-height: 1;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.55);
+        }
+
+        .pusula-north {
+            top: 7px;
+            left: 50%;
+            color: var(--cyan);
+            transform: translateX(-50%);
+        }
+
+        .pusula-east {
+            right: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .pusula-south {
+            bottom: 7px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pusula-west {
+            left: 7px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .pusula-needle {
+            position: absolute;
+            top: 21px;
+            left: 50%;
+            width: 14px;
+            height: 58px;
+            margin-left: -7px;
+            transform-origin: center;
+            transition: transform 0.12s linear;
+            z-index: 3;
+        }
+
+        .pusula-needle::before,
+        .pusula-needle::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform: translateX(-50%);
+        }
+
+        .pusula-needle::before {
+            top: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 29px solid var(--cyan);
+            filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.65));
+        }
+
+        .pusula-needle::after {
+            bottom: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 23px solid rgba(255, 0, 255, 0.72);
+            filter: drop-shadow(0 0 3px rgba(255, 0, 255, 0.45));
+        }
+
+        .pusula-pivot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border: 1px solid rgba(220, 255, 255, 0.9);
+            border-radius: 50%;
+            background: #07303b;
+            box-shadow: 0 0 7px rgba(0, 255, 255, 0.75);
+            transform: translate(-50%, -50%);
+            z-index: 4;
+        }
+
+
