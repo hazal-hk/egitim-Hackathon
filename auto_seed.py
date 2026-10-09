@@ -81,23 +81,39 @@ def get_country_info(country_name):
     if wiki_img:
         data["img2"] = wiki_img
 
-    # 3. KUSURSUZ METİN ÇEKİMİ
+
+    # 3. YENİ KUSURSUZ VE ZENGİN METİN ÇEKİMİ
     print("   - Tarih bilgisi alınıyor...")
     tarih = get_safe_wiki(f"{country_name} tarihi")
     
-    print("   - Coğrafya bilgisi alınıyor...")
-    cografya = get_safe_wiki(f"{country_name} coğrafyası")
+    print("   - Fiziki Coğrafya bilgisi alınıyor (Dağlar, Göller, Nehirler)...")
+    fiziki_cografya_1 = get_safe_wiki(f"{country_name} dağları")
+    fiziki_cografya_2 = get_safe_wiki(f"{country_name} nehirleri")
     
+    fiziki = ""
+    if fiziki_cografya_1:
+        fiziki += fiziki_cografya_1 + " "
+    if fiziki_cografya_2:
+        fiziki += fiziki_cografya_2
+        
     print("   - Kültür bilgisi alınıyor...")
     kultur = get_safe_wiki(f"{country_name} kültürü")
 
+    print("   - Yemek kültürü bilgisi alınıyor...")
+    yemekler = get_safe_wiki(f"{country_name} mutfağı")
+
     main_summary = None
-    if not kultur or not cografya or not tarih:
+    if not kultur or not tarih or not fiziki or not yemekler:
         main_summary = get_safe_wiki(country_name)
         
-    data["categories"]["Tarih"] = tarih if tarih else (main_summary if main_summary else f"{country_name} tarihi çok köklüdür.")
-    data["categories"]["Coğrafya"] = cografya if cografya else (main_summary if main_summary else f"{country_name} eşsiz coğrafyaya sahiptir.")
+    # Verileri SADECE İSTEDİĞİMİZ 4 KATEGORİYE YAZIYORUZ
+    data["categories"]["Tarih"] = tarih if tarih else (main_summary if main_summary else f"{country_name} köklü bir tarihe sahiptir.")
+    
+    data["categories"]["Fiziki Coğrafya"] = fiziki.strip() if fiziki.strip() else f"{country_name} çeşitli dağ sıraları, nehirler ve göllerden oluşan zengin bir fiziki yapıya sahiptir."
+    
     data["categories"]["Kültür"] = kultur if kultur else (main_summary if main_summary else f"{country_name} zengin gelenekleriyle bilinir.")
+
+    data["categories"]["Yemekler"] = yemekler if yemekler else f"{country_name} mutfağı bölgesel lezzetleriyle ünlüdür."
             
     return data
 
