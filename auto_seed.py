@@ -31,8 +31,8 @@ CATEGORY_TREE = {
     },
     "Kültür": {
         "Gelenekler": [("{c} kültürü", ("kültür",))],
-        "Mutfak": [("{c} mutfağı", ("mutfak",))],
-        "Sanat ve Müzik": [("{c} sanatı", ("sanat",)), ("{c} müziği", ("müzik",))],
+        "Mutfak": [("{c} mutfağı", ("mutfa",))],
+        "Sanat ve Müzik": [("{c} sanatı", ("sanat",)), ("{c} müziği", ("müzi",))],
     },
     "Ekonomi": {
         "Genel Ekonomi": [("{c} ekonomisi", ("ekonomi",))],
@@ -107,11 +107,14 @@ def flag_url(iso3):
 
 def build_text(country, queries, used):
     parts = []
+    st = stem(country)
     for q, must in queries:
-        p = wiki(q.format(c=country), country, must, used)
-        if p:
-            used.add(p["title"])
-            parts.append(p["extract"].strip())
+        for v in (q.format(c=country), f"{st}* {must[0]}*"):
+            p = wiki(v, country, must, used)
+            if p:
+                used.add(p["title"])
+                parts.append(p["extract"].strip().replace("\n", " "))
+                break
     return trim_text(" ".join(parts)) if parts else None
 
 
@@ -146,10 +149,11 @@ def seed_country(cur, db, name, cat_ids, force):
             return
 
     print(f"\n🚀 {name}")
-    used = set()                                              # fonksiyonun başına, print(f"\n🚀 ...")'ın altına
+    used = set()
     iso = row[1] if row else None
     flag = flag_url(iso) if iso else None
-    main_page = wiki(name, name, main=True)                   # eski wiki(name, name) yerine    img = (main_page or {}).get("thumbnail", {}).get("source")
+    main_page = wiki(name, name, main=True)
+    img = (main_page or {}).get("thumbnail", {}).get("source")
     summary = trim_text(main_page["extract"].strip()) if main_page else None
 
     if row:
