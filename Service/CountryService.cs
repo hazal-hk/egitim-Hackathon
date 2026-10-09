@@ -18,8 +18,16 @@ namespace Hackaton.Service
         public async Task<CountryModel> GetCountryByIdAsync(string id)
         {
           using IDbConnection db =  new MySqlConnection(_connectionString);
-            string sql = "SELECT Id, Capital, Name, Description, DidYouKnow FROM Countries WHERE Id = @Id";
-            return  await db.QueryFirstOrDefaultAsync<CountryModel>(sql, new { Id = id });
+            string sql = @"
+                SELECT 
+                    id AS Id, 
+                    name AS Name, 
+                    iso_code AS IsoCode, 
+                    image_1_url AS Image1Url, 
+                    image_2_url AS Image2Url
+                FROM countries 
+                WHERE id = @Id";
+            return await db.QueryFirstOrDefaultAsync<CountryModel>(sql, new { Id = id });
         }
     }
 }
