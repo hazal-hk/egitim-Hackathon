@@ -3,9 +3,10 @@ import os
 import requests
 from dotenv import load_dotenv
 import time
+import sys
 
 load_dotenv()
-HACKATHON_COUNTRIES = ["Türkiye", "Japonya", "Mısır", "İtalya", "Brezilya"]
+HACKATHON_COUNTRIES = ["Türkiye", "Japonya", "Mısır", "İtalya", "Brezilya", "Amerika Birleşik Devletleri", "Afganistan", "Almanya", "Andorra", "Angola", "Antigua ve Barbuda", "Arjantin", "Arnavutluk", "Avustralya", "Avusturya", "Azerbaycan", "Bahamalar", "Bahreyn", "Bangladeş", "Barbados", "Belarus", "Belçika", "Belize", "Benin", "Birleşik Arap Emirlikleri", "Birleşik Krallık", "Bolivya", "Bosna-Hersek", "Botsvana", "Brunei", "Bulgaristan", "Burkina Faso", "Burundi", "Cabo Verde", "Cezayir", "Cibuti", "Çad", "Çekya", "Çin", "Danimarka", "Doğu Timor", "Dominik Cumhuriyeti", "Dominika", "Ekvador", "Ekvator Ginesi", "El Salvador", "Endonezya", "Eritre", "Ermenistan", "Estonya", "Eswatini", "Etiyopya", "Fas", "Fiji", "Fildişi Sahili", "Filipinler", "Filistin", "Finlandiya", "Fransa", "Gabon", "Gambiya", "Gana", "Gine", "Gine-Bissau", "Grenada", "Guatemala", "Guyana", "Güney Afrika", "Güney Kore", "Güney Sudan", "Gürcistan", "Haiti", "Hırvatistan", "Hindistan", "Hollanda", "Honduras", "Irak", "İran", "İrlanda", "İspanya", "İsrail", "İsveç", "İsviçre", "İzlanda", "Jamaika", "Kamboçya", "Kamerun", "Kanada", "Karadağ", "Katar", "Kazakistan", "Kenya", "Kırgızistan", "Kiribati", "Kolombiya", "Komorlar", "Kongo Cumhuriyeti", "Kongo Demokratik Cumhuriyeti", "Kosta Rika", "Kuveyt", "Kuzey Kore", "Kuzey Makedonya", "Küba", "Kıbrıs Cumhuriyeti", "Laos", "Lesotho", "Letonya", "Liberya", "Libya", "Lihtenştayn", "Litvanya", "Lübnan", "Lüksemburg", "Macaristan", "Madagaskar", "Malavi", "Maldivler", "Malezya", "Mali", "Malta", "Marshall Adaları", "Mauritius", "Meksika", "Mikronezya", "Moldova", "Monako", "Moğolistan", "Moritanya", "Mozambik", "Myanmar", "Namibya", "Nauru", "Nepal", "Nijer", "Nijerya", "Nikaragua", "Norveç", "Özbekistan", "Pakistan", "Palau", "Panama", "Papua Yeni Gine", "Paraguay", "Peru", "Polonya", "Portekiz", "Romanya", "Ruanda", "Rusya", "Saint Kitts ve Nevis", "Saint Lucia", "Saint Vincent ve Grenadinler", "Samoa", "San Marino", "São Tomé ve Príncipe", "Senegal", "Sırbistan", "Seyşeller", "Sierra Leone", "Singapur", "Slovakya", "Slovenya", "Solomon Adaları", "Somali", "Sri Lanka", "Sudan", "Surinam", "Suriye", "Suudi Arabistan", "Şili", "Tacikistan", "Tanzanya", "Tayland", "Togo", "Tonga", "Trinidad ve Tobago", "Tunus", "Tuvalu", "Türkmenistan", "Uganda", "Ukrayna", "Umman", "Uruguay", "Vatikan", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Yeni Zelanda", "Yunanistan", "Zambiya", "Zimbabve"]
 
 def get_safe_wiki(query, get_image=False):
     # Wikimedia kuralları gereği robot olmadığımızı ve öğrenci projesi olduğumuzu mail ile kanıtlıyoruz
@@ -72,7 +73,6 @@ def get_country_info(country_name):
         if res.status_code == 200:
             rj = res.json()
             if isinstance(rj, list) and rj:
-                # birden fazla eşleşmede Türkçe adı tam tutanı seç
                 match = next(
                     (c for c in rj
                      if c.get("translations", {}).get("tur", {}).get("common") == country_name),
@@ -89,26 +89,27 @@ def get_country_info(country_name):
         data["img2"] = wiki_img
 
     # 3. Metinler
-    print("   - Genel coğrafya...")
+    print("   - Coğrafya...")
     cografya = get_safe_wiki(f"{country_name} coğrafyası")
-
-    print("   - Fiziki coğrafya...")
     dag = get_safe_wiki(f"{country_name} dağları")
     nehir = get_safe_wiki(f"{country_name} nehirleri")
     fiziki = " ".join(p for p in (dag, nehir) if p)
 
+    print("   - Kültür...")
+    kultur = get_safe_wiki(f"{country_name} kültürü")
+    yemekler = get_safe_wiki(f"{country_name} mutfağı")
+
     print("   - Tarih...")
     tarih = get_safe_wiki(f"{country_name} tarihi")
 
-    print("   - Kültür...")
-    kultur = get_safe_wiki(f"{country_name} kültürü")
+    print("   - Ekonomi...")
+    ekonomi = get_safe_wiki(f"{country_name} ekonomisi")
+    tarim = get_safe_wiki(f"{country_name} tarımı")
+    sanayi = get_safe_wiki(f"{country_name} sanayisi")
+    sektorler = " ".join(p for p in (tarim, sanayi) if p)
 
-    print("   - Mutfak...")
-    yemekler = get_safe_wiki(f"{country_name} mutfağı")
-
-    # Ana özet sadece bir şey eksikse çekilir (lazy fallback)
     main_summary = None
-    if not all((cografya, fiziki, tarih, kultur, yemekler)):
+    if not all((cografya, fiziki, kultur, yemekler, tarih, ekonomi, sektorler)):
         main_summary = get_safe_wiki(country_name)
 
     data["tree"] = {
@@ -122,6 +123,10 @@ def get_country_info(country_name):
         },
         "Tarih": {
             "Genel Tarih": tarih or main_summary or f"{country_name} köklü bir tarihe sahiptir.",
+        },
+        "Ekonomi": {
+            "Genel Ekonomi": ekonomi or main_summary or f"{country_name} çeşitli sektörlere dayanan bir ekonomiye sahiptir.",
+            "Tarım ve Sanayi": sektorler or f"{country_name} ekonomisinde tarım ve sanayi önemli yer tutar.",
         },
     }
 
@@ -191,4 +196,6 @@ def run_auto_seeder():
     print("\n🎉 İŞLEM TAMAM! 3 BOYUTLU VERİTABANI MİMARİSİ AKTİF.")
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        HACKATHON_COUNTRIES[:] = sys.argv[1:]
     run_auto_seeder()
