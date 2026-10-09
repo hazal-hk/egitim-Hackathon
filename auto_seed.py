@@ -9,7 +9,7 @@ HACKATHON_COUNTRIES = ["Türkiye", "Japonya", "Mısır", "İtalya", "Brezilya"]
 
 def get_safe_wiki(query, get_image=False):
     # Wikimedia kuralları gereği robot olmadığımızı ve öğrenci projesi olduğumuzu mail ile kanıtlıyoruz
-    headers = {"User-Agent": "WorldEduHackathonBot/1.0 (hazal.karayigit@ktu.edu.tr)"}
+    headers = {"User-Agent": "WorldEduHackathonBot/1.0 (448887@ogr.ktu.edu.tr)"}
     
     # GÜVENLİK DUVARI İÇİN KRİTİK NOKTA: Her istekten önce 1.5 saniye nefes al!
     time.sleep(1.5)
@@ -55,84 +55,76 @@ def get_safe_wiki(query, get_image=False):
     return None
 
 def get_country_info(country_name):
-    print(f"\n🚀 {country_name} için Resmi Wikipedia API'sine yavaş ve güvenli bağlanılıyor...")
-    
+    print(f"\n🚀 {country_name} için Wikipedia API'sine bağlanılıyor...")
+
     data = {
-        "name": country_name, 
-        "iso": None, 
-        "img1": f"https://placehold.co/800x400/png?text={country_name}+Bayrak", 
+        "name": country_name,
+        "iso": None,
+        "img1": f"https://placehold.co/800x400/png?text={country_name}+Bayrak",
         "img2": f"https://placehold.co/800x400/png?text={country_name}+Manzara",
-        "categories": {}
     }
-    
-    # 1. REST Countries (Bayrak ve ISO)
+
+    # 1. REST Countries (bayrak + ISO)
     try:
-        res = requests.get(f"https://restcountries.com/v3.1/translation/{country_name}", timeout=5)
+        res = requests.get(
+            f"https://restcountries.com/v3.1/translation/{country_name}", timeout=5
+        )
         if res.status_code == 200:
             rj = res.json()
-            if isinstance(rj, list) and len(rj) > 0:
-                data["iso"] = rj[0].get("cca3", data["iso"])
-                data["img1"] = rj[0].get("flags", {}).get("png", data["img1"])
+            if isinstance(rj, list) and rj:
+                # birden fazla eşleşmede Türkçe adı tam tutanı seç
+                match = next(
+                    (c for c in rj
+                     if c.get("translations", {}).get("tur", {}).get("common") == country_name),
+                    rj[0],
+                )
+                data["iso"] = match.get("cca3")
+                data["img1"] = match.get("flags", {}).get("png", data["img1"])
     except Exception:
         pass
 
-    # 2. Wikipedia Görsel
+    # 2. Wikipedia görsel
     wiki_img = get_safe_wiki(country_name, get_image=True)
     if wiki_img:
         data["img2"] = wiki_img
 
+    # 3. Metinler
+    print("   - Genel coğrafya...")
+    cografya = get_safe_wiki(f"{country_name} coğrafyası")
 
-    # 3. YENİ KUSURSUZ VE ZENGİN METİN ÇEKİMİ
-    print("   - Tarih bilgisi alınıyor...")
+    print("   - Fiziki coğrafya...")
+    dag = get_safe_wiki(f"{country_name} dağları")
+    nehir = get_safe_wiki(f"{country_name} nehirleri")
+    fiziki = " ".join(p for p in (dag, nehir) if p)
+
+    print("   - Tarih...")
     tarih = get_safe_wiki(f"{country_name} tarihi")
-    
-    print("   - Fiziki Coğrafya bilgisi alınıyor (Dağlar, Göller, Nehirler)...")
-    fiziki_cografya_1 = get_safe_wiki(f"{country_name} dağları")
-    fiziki_cografya_2 = get_safe_wiki(f"{country_name} nehirleri")
-    
-    fiziki = ""
-    if fiziki_cografya_1:
-        fiziki += fiziki_cografya_1 + " "
-    if fiziki_cografya_2:
-        fiziki += fiziki_cografya_2
-        
-    print("   - Kültür bilgisi alınıyor...")
+
+    print("   - Kültür...")
     kultur = get_safe_wiki(f"{country_name} kültürü")
 
-    print("   - Yemek kültürü bilgisi alınıyor...")
+    print("   - Mutfak...")
     yemekler = get_safe_wiki(f"{country_name} mutfağı")
 
+    # Ana özet sadece bir şey eksikse çekilir (lazy fallback)
     main_summary = None
-    if not kultur or not tarih or not fiziki or not yemekler:
+    if not all((cografya, fiziki, tarih, kultur, yemekler)):
         main_summary = get_safe_wiki(country_name)
-        
-    # Verileri SADECE İSTEDİĞİMİZ 4 KATEGORİYE YAZIYORUZ
-    data["categories"]["Tarih"] = tarih if tarih else (main_summary if main_summary else f"{country_name} köklü bir tarihe sahiptir.")
-    
-    data["categories"]["Fiziki Coğrafya"] = fiziki.strip() if fiziki.strip() else f"{country_name} çeşitli dağ sıraları, nehirler ve göllerden oluşan zengin bir fiziki yapıya sahiptir."
-    
-    data["categories"]["Kültür"] = kultur if kultur else (main_summary if main_summary else f"{country_name} zengin gelenekleriyle bilinir.")
 
-    data["categories"]["Yemekler"] = yemekler if yemekler else f"{country_name} mutfağı bölgesel lezzetleriyle ünlüdür."
-            
-    return data
-
-    # 4. KUSURSUZ AĞAÇ (TREE) YAPISI
-    # Artık verileri düz değil, dallanıp budaklanacak şekilde paketliyoruz
     data["tree"] = {
         "Coğrafya": {
-            "Genel": cografya if cografya else f"{country_name} eşsiz bir coğrafyaya sahiptir.",
-            "Fiziki (Dağlar ve Nehirler)": fiziki.strip() if fiziki.strip() else f"{country_name} dağlar ve göllerden oluşan zengin bir fiziki yapıya sahiptir."
+            "Genel Coğrafya": cografya or main_summary or f"{country_name} eşsiz bir coğrafyaya sahiptir.",
+            "Fiziki Coğrafya": fiziki or f"{country_name} dağlar ve nehirler barındırır.",
         },
         "Kültür": {
-            "Genel Gelenekler": kultur if kultur else f"{country_name} zengin gelenekleriyle bilinir.",
-            "Yemekler (Mutfak)": yemekler if yemekler else f"{country_name} mutfağı çok lezzetlidir."
+            "Gelenekler": kultur or main_summary or f"{country_name} zengin gelenekleriyle bilinir.",
+            "Yemekler": yemekler or f"{country_name} mutfağı ünlüdür.",
         },
         "Tarih": {
-            "Kısa Tarihçe": tarih if tarih else f"{country_name} köklü bir tarihe sahiptir."
-        }
+            "Genel Tarih": tarih or main_summary or f"{country_name} köklü bir tarihe sahiptir.",
+        },
     }
-            
+
     return data
 
 def run_auto_seeder():
