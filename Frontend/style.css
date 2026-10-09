@@ -66,3 +66,39 @@
             animation: pulse-ring 3s ease-in-out infinite;
             position: relative;
         }
+        .hud-logo-icon::before{
+            content: '';
+            width:10px;
+            height: 10px;
+            background: var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan);
+        }
+
+        .hud-logo-text{
+            font-family:'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            text-shadow: 0 0 20px var(--cyan-dim);
+            text-transform:uppercase;
+        }
+
+        .hud-durum{
+            display:flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hud-durum-item{
+            font-family: 'Share Tech Mono', monospace;
+            font-size:11px;
+            color: rgba(0,255,255,0.6);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        
