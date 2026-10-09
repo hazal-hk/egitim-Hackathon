@@ -751,7 +751,7 @@
             animation: particle-float linear infinite;
         }
 
-        /* ═══════ ANIMATIONS ═══════ */
+        /* ═══════ Animasyonlar ═══════ */
         @keyframes pulse-ring {
 
             0%,
@@ -840,7 +840,7 @@
             }
         }
 
-        /* ═══════ MAP UI OVERRIDES ═══════ */
+        /* ═══════ Harita Overridelar ═══════ */
         .mapboxgl-ctrl-attrib {
             display: none !important;
         }
