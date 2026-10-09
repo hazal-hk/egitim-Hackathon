@@ -733,3 +733,291 @@
                 description: seaDescriptionsTr[sourceName] || `${displayName}, çevresindeki kıyılar ve açık denizlerle etkileşim içindeki bir su kütlesidir. Tuzluluğu konuma, mevsime ve tatlı su girişine göre değişir.`
             };
         }
+        function getUnwrappedTargetLng(targetLng, currentLng) {
+            let diff = (targetLng - currentLng) % 360;
+            if (diff > 180) diff -= 360;
+            if (diff < -180) diff += 360;
+            return currentLng + diff;
+        }
+
+        // ulkenin tam ortasini bulma
+        function getUlkeSinirMerkeziVeBounds(feature, fallbackLngLat) {
+            const fallbackPoint = fallbackLngLat ? [fallbackLngLat.lng, fallbackLngLat.lat] : [0, 0];
+            if (!feature || !feature.geometry) {
+                return {
+                    center: fallbackPoint,
+                    bounds: new mapboxgl.LngLatBounds(fallbackPoint, fallbackPoint)
+                };
+            }
+
+            let anaPoligonlar = [];
+
+            if (feature.geometry.type === 'Polygon') {
+                anaPoligonlar = [feature.geometry.coordinates[0]];
+            } else if (feature.geometry.type === 'MultiPolygon') {
+                // Her poligon parçasının alanını ve sınırlarını tespit et
+                const poligonListesi = feature.geometry.coordinates.map((poly) => {
+                    const halka = poly[0];
+                    if (!halka || halka.length < 3) return null;
+                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                    for (let i = 0; i < halka.length; i++) {
+                        const pt = halka[i];
+                        if (pt[0] < minX) minX = pt[0];
+                        if (pt[0] > maxX) maxX = pt[0];
+                        if (pt[1] < minY) minY = pt[1];
+                        if (pt[1] > maxY) maxY = pt[1];
+                    }
+                    const alan = (maxX - minX) * (maxY - minY);
+                    return { halka, alan, minX, maxX, minY, maxY };
+                }).filter(Boolean);
+
+                if (poligonListesi.length === 0) {
+                    return {
+                        center: fallbackPoint,
+                        bounds: new mapboxgl.LngLatBounds(fallbackPoint, fallbackPoint)
+                    };
+                }
+
+                // en buyuk kara barcasini bul
+                poligonListesi.sort((a, b) => b.alan - a.alan);
+                const enBuyuk = poligonListesi[0];
+
+                // 180 meridyeni asan ulkeler
+                if (enBuyuk.minX >= 0 && enBuyuk.alan > 80) {
+                    anaPoligonlar = poligonListesi
+                        .filter(p => p.minX >= 0 && p.alan > enBuyuk.alan * 0.005)
+                        .map(p => p.halka);
+                } else if (enBuyuk.maxX <= 0 && enBuyuk.alan > 80) {
+                    anaPoligonlar = poligonListesi
+                        .filter(p => p.maxX <= 0 && p.alan > enBuyuk.alan * 0.005)
+                        .map(p => p.halka);
+                } else {
+                    anaPoligonlar = poligonListesi
+                        .filter(p => p.alan >= enBuyuk.alan * 0.02)
+                        .map(p => p.halka);
+                }
+
+                if (anaPoligonlar.length === 0) {
+                    anaPoligonlar = [enBuyuk.halka];
+                }
+            }
+
+            // sinir kutusunu hesapla
+            let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+            anaPoligonlar.forEach(halka => {
+                halka.forEach(pt => {
+                    if (pt[0] < minLng) minLng = pt[0];
+                    if (pt[0] > maxLng) maxLng = pt[0];
+                    if (pt[1] < minLat) minLat = pt[1];
+                    if (pt[1] > maxLat) maxLat = pt[1];
+                });
+            });
+
+            // sinirlarin tam ortasi
+            const centerLng = (minLng + maxLng) / 2;
+            const centerLat = (minLat + maxLat) / 2;
+            const bounds = new mapboxgl.LngLatBounds([minLng, minLat], [maxLng, maxLat]);
+
+            return {
+                center: [centerLng, centerLat],
+                bounds: bounds
+            };
+        }
+
+        // deniz sinirlarnin merkezi
+        function getDenizSinirMerkeziVeBounds(feature, clickLngLat) {
+            const rawLng = clickLngLat ? clickLngLat.lng : 0;
+            const clickLat = clickLngLat ? clickLngLat.lat : 0;
+            let normLng = ((rawLng + 180) % 360 + 360) % 360 - 180;
+
+            let poligonlar = [];
+
+            if (feature.geometry.type === 'Polygon') {
+                poligonlar = [feature.geometry.coordinates[0]];
+            } else if (feature.geometry.type === 'MultiPolygon') {
+                const parcalar = feature.geometry.coordinates.map(poly => {
+                    const ring = poly[0];
+                    if (!ring || ring.length < 3) return null;
+                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                    for (let i = 0; i < ring.length; i++) {
+                        const pt = ring[i];
+                        if (pt[0] < minX) minX = pt[0];
+                        if (pt[0] > maxX) maxX = pt[0];
+                        if (pt[1] < minY) minY = pt[1];
+                        if (pt[1] > maxY) maxY = pt[1];
+                    }
+                    const alan = (maxX - minX) * (maxY - minY);
+                    return { ring, alan, minX, maxX, minY, maxY };
+                }).filter(Boolean);
+
+                if (parcalar.length === 0) {
+                    return {
+                        center: [normLng, clickLat],
+                        bounds: new mapboxgl.LngLatBounds([normLng - 5, clickLat - 5], [normLng + 5, clickLat + 5])
+                    };
+                }
+
+                //okyanus bul
+                let secilen = parcalar.find(p =>
+                    normLng >= p.minX - 3 && normLng <= p.maxX + 3 &&
+                    clickLat >= p.minY - 3 && clickLat <= p.maxY + 3
+                );
+
+                if (!secilen) {
+                    let minD = Infinity;
+                    parcalar.forEach(p => {
+                        const cX = (p.minX + p.maxX) / 2;
+                        const cY = (p.minY + p.maxY) / 2;
+                        let dX = Math.abs(normLng - cX);
+                        if (dX > 180) dX = 360 - dX;
+                        const dY = Math.abs(clickLat - cY);
+                        const dist = dX * dX + dY * dY;
+                        if (dist < minD) {
+                            minD = dist;
+                            secilen = p;
+                        }
+                    });
+                }
+
+                poligonlar = [secilen ? secilen.ring : parcalar[0].ring];
+            }
+
+            let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
+            poligonlar.forEach(halka => {
+                halka.forEach(pt => {
+                    if (pt[0] < minLng) minLng = pt[0];
+                    if (pt[0] > maxLng) maxLng = pt[0];
+                    if (pt[1] < minLat) minLat = pt[1];
+                    if (pt[1] > maxLat) maxLat = pt[1];
+                });
+            });
+
+            const centerLng = (minLng + maxLng) / 2;
+            const centerLat = (minLat + maxLat) / 2;
+            const bounds = new mapboxgl.LngLatBounds([minLng, minLat], [maxLng, maxLat]);
+
+            return {
+                center: [centerLng, centerLat],
+                bounds: bounds
+            };
+        }
+
+        let countryOrbitFrame = null;
+        let countryOrbitState = {
+            active: false,
+            paused: false,
+            center: null,
+            zoom: null,
+            key: null,
+            bearing: 0,
+            speed: 11,
+            lastTime: 0
+        };
+        let lastFocusedCountryName = null;
+        let countrySelectionToken = 0;
+        let countryFocusOrbitTarget = null;
+        let spacePausedCountryOrbit = false;
+
+        function getOrbitKey(center, zoom) {
+            if (!center || typeof zoom !== 'number') return null;
+            return `${Number(center[0]).toFixed(4)}|${Number(center[1]).toFixed(4)}|${Number(zoom).toFixed(4)}`;
+        }
+
+        function stopCountryOrbit() {
+            if (countryOrbitFrame) {
+                cancelAnimationFrame(countryOrbitFrame);
+                countryOrbitFrame = null;
+            }
+
+            countryOrbitState.active = false;
+            countryOrbitState.paused = false;
+            countryOrbitState.center = null;
+            countryOrbitState.zoom = null;
+            countryOrbitState.key = null;
+        }
+
+        function resetCountryFocusState() {
+            lastFocusedCountryName = null;
+            countryFocusOrbitTarget = null;
+            spacePausedCountryOrbit = false;
+            stopCountryOrbit();
+        }
+
+        function startCountryOrbit(center, zoom = map.getZoom()) {
+            if (!center) return;
+
+            const orbitKey = getOrbitKey(center, zoom);
+            const sameTarget = countryOrbitState.active && countryOrbitState.key === orbitKey;
+
+            if (sameTarget) {
+                countryOrbitState.paused = false;
+                return;
+            }
+
+            if (countryOrbitState.active) {
+                stopCountryOrbit();
+            }
+
+            const nextState = {
+                active: true,
+                paused: false,
+                center: center,
+                zoom: zoom,
+                key: orbitKey,
+                bearing: map.getBearing() || 0,
+                speed: 11,
+                lastTime: performance.now()
+            };
+            countryOrbitState = nextState;
+
+            const tick = (now) => {
+                if (!countryOrbitState.active || countryOrbitState.paused) return;
+
+                const delta = (now - countryOrbitState.lastTime) / 1000;
+                countryOrbitState.lastTime = now;
+                countryOrbitState.bearing = (countryOrbitState.bearing + countryOrbitState.speed * delta) % 360;
+
+                map.setCenter(countryOrbitState.center);
+                map.setZoom(countryOrbitState.zoom);
+                map.setBearing(countryOrbitState.bearing);
+                map.setPitch(45);
+
+                countryOrbitFrame = requestAnimationFrame(tick);
+            };
+
+            countryOrbitFrame = requestAnimationFrame(tick);
+        }
+
+        function pauseCountryOrbit() {
+            if (!countryOrbitState.active) return;
+            countryOrbitState.paused = true;
+            if (countryOrbitFrame) {
+                cancelAnimationFrame(countryOrbitFrame);
+                countryOrbitFrame = null;
+            }
+        }
+
+        function resumeCountryOrbit() {
+            if (!countryOrbitState.active || !countryOrbitState.center) return;
+            if (countryOrbitState.paused) {
+                countryOrbitState.paused = false;
+                countryOrbitState.lastTime = performance.now();
+
+                const tick = (now) => {
+                    if (!countryOrbitState.active || countryOrbitState.paused) return;
+
+                    const delta = (now - countryOrbitState.lastTime) / 1000;
+                    countryOrbitState.lastTime = now;
+                    countryOrbitState.bearing = (countryOrbitState.bearing + countryOrbitState.speed * delta) % 360;
+
+                    map.setCenter(countryOrbitState.center);
+                    map.setZoom(countryOrbitState.zoom);
+                    map.setBearing(countryOrbitState.bearing);
+                    map.setPitch(45);
+
+                    countryOrbitFrame = requestAnimationFrame(tick);
+                };
+
+                countryOrbitFrame = requestAnimationFrame(tick);
+            }
+        }
