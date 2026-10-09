@@ -26,29 +26,49 @@
 
         // ═══════ LOADING SIMULATION ═══════
         let loadProgress = 0;
+        let isReadyToShow = false;
         const loadingScreen = document.getElementById('loading-screen');
-        const loadInterval = setInterval(() => {
-            loadProgress += Math.random() * 15 + 5;
-            if (loadProgress > 100) loadProgress = 100;
-            document.getElementById('loading-bar').style.width = loadProgress + '%';
-            if (loadProgress >= 100) {
-                clearInterval(loadInterval);
-                const showStartPrompt = () => {
-                    setTimeout(() => loadingScreen.classList.add('ready'), 600);
-                };
+        const loadingBar = document.getElementById('loading-bar');
 
-                if (map.loaded()) {
-                    showStartPrompt();
-                } else {
-                    map.once('idle', showStartPrompt);
-                }
+        const markReady = () => {
+            if (isReadyToShow) return;
+            isReadyToShow = true;
+            if (loadingBar) loadingBar.style.width = '100%';
+            if (loadingScreen) {
+                loadingScreen.classList.add('ready');
             }
-        }, 200);
+        };
 
-        loadingScreen.addEventListener('click', (event) => {
-            if (!loadingScreen.classList.contains('ready') || event.button !== 0) return;
-            loadingScreen.classList.add('hidden');
-        });
+        const loadInterval = setInterval(() => {
+            loadProgress += Math.random() * 18 + 10;
+            if (loadProgress >= 100) {
+                loadProgress = 100;
+                clearInterval(loadInterval);
+                if (loadingBar) loadingBar.style.width = '100%';
+
+                // Harita durumuna göre veya güvenlik zaman aşımıyla hazır duruma getir
+                if (typeof map !== 'undefined' && map && typeof map.loaded === 'function' && map.loaded()) {
+                    setTimeout(markReady, 300);
+                } else if (typeof map !== 'undefined' && map && typeof map.once === 'function') {
+                    map.once('load', () => setTimeout(markReady, 200));
+                    map.once('idle', () => setTimeout(markReady, 200));
+                    setTimeout(markReady, 800); // Harita arka plan yüklemesi uzasa bile asla takılı kalmaz
+                } else {
+                    setTimeout(markReady, 400);
+                }
+            } else if (loadingBar) {
+                loadingBar.style.width = loadProgress + '%';
+            }
+        }, 100);
+
+        if (loadingScreen) {
+            loadingScreen.addEventListener('click', (event) => {
+                if (event.button !== 0) return;
+                if (loadProgress >= 100 || loadingScreen.classList.contains('ready')) {
+                    loadingScreen.classList.add('hidden');
+                }
+            });
+        }
 
         // ═══════ MAP INIT ═══════
         mapboxgl.accessToken = 'pk.eyJ1IjoiYWxwZXJpdHRvNSIsImEiOiJjbXV4ZzZ4d3gwOTh3MnhzZmgxNmUwOGpvIn0.Izv0zJRodMPyWUY2CrB_SQ';
