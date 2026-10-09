@@ -8,6 +8,7 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
+builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.CountryService>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

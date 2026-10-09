@@ -5,6 +5,6 @@ namespace Hackaton.Service
 {
     public interface ICountryService
     {
-        Task<CountryModel> GetCountryDetailDto(string Id);
+        Task<CountryModel> GetCountryByIdAsync(string Id);
     }
 }
