@@ -1134,7 +1134,7 @@
                 });
             }
 
-            // Kameraya uç (En kısa küre rotasıyla unwrap ederek)
+            // Kameraya uç (En kısa rotasıyla unwrap ederek)
             const optimumKamera = map.cameraForBounds(bounds, {
                 padding: { top: 60, bottom: 60, left: 60, right: 420 },
                 pitch: 45
@@ -1446,3 +1446,65 @@
                 document.getElementById('country-info-template').innerHTML = '';
             }, 600);
         }
+// Alt kategori başlıkları ve içerikleri (Sizin özelleştirdiğiniz liste)
+const subCategories = {
+    geography: ["Genel Coğrafya", "Fiziki Coğrafya"],
+    culture: ["Gelenekler", "Yemekler"],
+    history: ["Genel Tarih"],
+    economy: ["Genel Ekonomi", "Tarım ve Sanayi"]
+};
+
+const mainContainer = document.getElementById('main-buttons-container');
+const subContainer = document.getElementById('sub-buttons-container');
+const dynamicSubButtons = document.getElementById('dynamic-sub-buttons');
+const backButton = document.getElementById('back-to-main');
+
+// 1. Ana kategori butonlarına tıklama olayı
+document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const categoryKey = btn.getAttribute('data-category');
+        const items = subCategories[categoryKey] || [];
+
+        // Dinamik alt butonları oluştur (üstteki küçük etiketler olmadan)
+        dynamicSubButtons.innerHTML = '';
+        items.forEach(subItem => {
+            const subBtn = document.createElement('button');
+            subBtn.className = 'stat-box';
+            subBtn.innerHTML = `
+                <div class="stat-value">${subItem}</div>
+            `;
+            
+            // Alt butona tıklandığında bilgi gösterme
+            subBtn.addEventListener('click', () => {
+                // Eğer devam eden bir daktilo animasyonu varsa onu durdur
+                if (typeof yazmaAnimasyonu !== 'undefined') {
+                    clearInterval(yazmaAnimasyonu);
+                }
+
+                const activeCountry = document.getElementById('country-name').textContent;
+                const infoTemplate = '<span class="prompt">&gt;</span> <span data-text-slot></span>';
+                
+                // Projenizde daktilo efekti varsa ve infoText tanımlıysa çalışır, aksi takdirde direkt yazdırır
+                if (typeof daktiloYaz === 'function' && typeof infoText !== 'undefined') {
+                    daktiloYaz(infoTemplate, infoText, 'country-info', 12);
+                } else {
+                    document.getElementById('country-info').innerHTML = `> ${activeCountry}<br>${subItem}: `;
+                }
+            });
+
+            dynamicSubButtons.appendChild(subBtn);
+        });
+
+        // 4 ana butonu gizle, alt butonları göster
+        mainContainer.style.display = 'none';
+        subContainer.style.display = 'grid';
+    });
+});
+
+// 2. "Geri Dön" butonuna tıklama olayı (Ana menüye dönüş)
+if (backButton) {
+    backButton.addEventListener('click', () => {
+        subContainer.style.display = 'none';
+        mainContainer.style.display = 'grid';
+    });
+}

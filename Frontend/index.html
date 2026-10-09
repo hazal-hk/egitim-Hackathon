@@ -84,7 +84,7 @@
         <div class="card-glow-line"></div>
         <button class="card-close" id="card-close" title="Kapat">✕</button>
         <div class="card-header">
-            <div class="card-tag">Küresel İstihbarat Ağı</div>
+            <div class="card-tag">Dünya Topografik Haritası</div>
             <h2 class="card-title" id="country-name">--</h2>
             <div class="card-subtitle" id="card-subtitle">// BÖLGE VERİSİ YÜKLENİYOR...</div>
         </div>
@@ -94,17 +94,36 @@
             </div>
         </div>
         <div class="card-footer">
-            <div class="stat-box">
-                <div class="stat-label">Sinyal</div>
-                <div class="stat-value" id="stat-signal">--</div>
+            <!-- Ana Butonlar (Coğrafya, Kültür, Tarih, Ekonomi) -->
+            <div id="main-buttons-container" class="button-grid">
+                <button class="stat-box category-btn" data-category="geography">
+                    <div class="stat-value">Coğrafya</div>
+                </button>
+                <button class="stat-box category-btn" data-category="culture">
+                    <div class="stat-value">Kültür</div>
+                </button>
+                <button class="stat-box category-btn" data-category="history">
+                    <div class="stat-value">Tarih</div>
+                </button>
+                <button class="stat-box category-btn" data-category="economy">
+                    <div class="stat-value">Ekonomi</div>
+                </button>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">Tehdit</div>
-                <div class="stat-value" id="stat-threat">--</div>
+
+            <!-- Bir Butona Tıklandığında Çıkacak Alt Butonlar Alanı (Başlangıçta gizli) -->
+            <div id="sub-buttons-container" class="button-grid" style="display: none;">
+                <button class="stat-box sub-back-btn" id="back-to-main">
+                    <div class="stat-value">← Ana Menü</div>
+                </button>
+                <!-- Seçilen kategoriye göre JS ile dolacak alt butonlar buraya gelecek -->
+                <div id="dynamic-sub-buttons" style="display: contents;"></div>
             </div>
-            <div class="stat-box">
-                <div class="stat-label">Durum</div>
-                <div class="stat-value" id="stat-status">--</div>
+
+            <!-- JavaScript'in hata vermemesi için arka planda tutulan gizli orijinal elementler -->
+            <div style="display: none;">
+                <span id="stat-signal"></span>
+                <span id="stat-threat"></span>
+                <span id="stat-status"></span>
             </div>
         </div>
     </div>

@@ -9,7 +9,7 @@
             "name": "Launch Integrated Browser",
             "request": "launch",
             "type": "editor-browser",
-            "url": "http://localhost:5050",
+            "url": "http://localhost:5500",
             "webRoot": "${workspaceFolder}"
         },
         {
