@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.CountryService>();
+builder.Services.AddScoped<Hackaton.Service.ICategoryService, Hackaton.Service.CategoryService>();
 
 var app = builder.Build();
 
