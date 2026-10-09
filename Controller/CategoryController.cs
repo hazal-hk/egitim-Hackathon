@@ -23,7 +23,7 @@ namespace Hackaton.Controller
         }
         // Örn: /api/category/parent/8 -> Coğrafya kategorisinin altındaki başlıkları (Fiziki Coğrafya vb.) getirir.
         [HttpGet("parent/{parentId}")]
-        public async Task<IActionResult> GetSubCategories(int parentId)
+        public async Task<IActionResult> GetSubCategories(string parentId)
         {
             var subCategories = await _categoryService.GetSubCategoriesAsync(parentId);
             return Ok(subCategories);
@@ -31,7 +31,7 @@ namespace Hackaton.Controller
 
         // Örn: /api/category/country/1 -> Türkiye'ye (ID: 1) tıklandığında, Türkiye'nin verisi olan kategorileri getirir.
         [HttpGet("country/{countryId}")]
-        public async Task<IActionResult> GetCategoriesByCountry(int countryId)
+        public async Task<IActionResult> GetCategoriesByCountry(string countryId)
         {
             var categories = await _categoryService.GetCategoriesByCountryIdAsync(countryId);
 

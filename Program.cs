@@ -1,3 +1,5 @@
+using Hackaton.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,6 +10,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.CountryService>();
 builder.Services.AddScoped<Hackaton.Service.ICategoryService, Hackaton.Service.CategoryService>();
+builder.Services.AddScoped<ICountryContentService, CountryContentService>();
 
 var app = builder.Build();
 
