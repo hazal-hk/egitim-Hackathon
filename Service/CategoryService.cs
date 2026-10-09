@@ -28,20 +28,29 @@ namespace Hackaton.Service
         public async Task<IEnumerable<CategoryModel>> GetCategoriesByCountryIdAsync(string countryId)
         {
             using IDbConnection db = new MySqlConnection(_connectionString);
-            string sql = @"
-                DISTINCT c.id AS Id, c.name AS Name, c.parent_id AS ParentId 
-                FROM categories c
-                JOIN country_contents cc ON c.id = cc.category_id
-                WHERE cc.country_id = @CountryId";
 
-            // Not: DISTINCT anahtar kelimesi ile mükerrer kategori kayıtlarını önlüyoruz
-            string distinctSql = @"
-                SELECT DISTINCT cat.id AS Id, cat.name AS Name, cat.parent_id AS ParentId
-                FROM categories cat
-                INNER JOIN country_contents cc ON cat.id = cc.category_id
-                WHERE cc.country_id = @CountryId";
+            // 1. ADIM: Sadece country_contents tablosundan o ülkeye ait kategori ID'lerini çekiyoruz (JOIN kullanmadan)
+            string getIdsSql = "SELECT DISTINCT category_id FROM country_contents WHERE country_id = @CountryId";
+            var categoryIds = await db.QueryAsync<string>(getIdsSql, new { CountryId = countryId });
 
-            return await db.QueryAsync<CategoryModel>(distinctSql, new { CountryId = countryId });
+            // Eğer o ülkenin hiçbir içeriği yoksa, patlamaması için boş bir liste dönüyoruz
+            if (categoryIds == null || !categoryIds.Any())
+            {
+                return new List<CategoryModel>();
+            }
+
+            // 2. ADIM: İlk sorgudan bulduğumuz Kategori ID'lerini kullanarak 'categories' tablosundan bu kategorilerin isimlerini çekiyoruz
+            string getCategoriesSql = @"
+            SELECT 
+            id AS Id, 
+            name AS Name, 
+            parent_id AS ParentId 
+            FROM categories 
+             WHERE id IN @CategoryIds";
+
+            var categories = await db.QueryAsync<CategoryModel>(getCategoriesSql, new { CategoryIds = categoryIds });
+
+            return categories;
         }
     }
 }
