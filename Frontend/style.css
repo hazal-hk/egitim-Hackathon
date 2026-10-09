@@ -551,5 +551,324 @@
             animation: glow-pulse 3s ease-in-out infinite;
         }
 
+        /* -- Kapat butonu -- */
+        .kart-kapat{
+            position:absolute;
+            top: 16px;
+            right: 16px;
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 6px;
+            background: rgba(0, 255, 255, 0.05);
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 30;
+            pointer-events: auto;
+
+        }
+        .kart-kapat:hover {
+            border-color: var(--magenta);
+            color: var(--magenta);
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
+        }
+
+         /* ═══════ HOVER TOOLTIP ═══════ */
+
+         .hover-tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: var(--dark-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            z-index: 30;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--cyan-glow);
+        }
+        .hover-tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════ Yukleme Ekrani ═══════ */
+        .yukleme-ekrani{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background: #031429;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1.2s ease, visibility 1.2s ease;
+        }
+        .yukleme-ekrani.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .yukleme-icerik {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: min(100%, 400px);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .yukleme-ekrani.ready {
+            cursor: pointer;
+        }
+
+        .yukleme-hex {
+            width: 60px;
+            height: 60px;
+            border: 2px solid var(--cyan);
+            animation: hex-spin 2s ease-in-out infinite;
+            margin-bottom: 26px;
+            position: relative;
+        }
+
+        .yukleme-hex::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid var(--magenta);
+            animation: hex-spin 2s ease-in-out infinite reverse;
+        }
+
+        .yukleme-yazi {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            animation: text-flicker 1.5s ease-in-out infinite;
+        }
+
+        .yukleme-marka {
+            margin-bottom: 28px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--cyan-dim);
+            animation: none;
+        }
+
+        .yukleme-bar-container {
+            width: 220px;
+            height: 2px;
+            background: rgba(0, 255, 255, 0.1);
+            margin-top: 20px;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .yukleme-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--cyan);
+        }
+
+        .yukleme-baslat {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s ease;
+        }
+
+        .yukleme-baslat {
+            margin-top: 24px;
+            color: var(--cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--cyan-dim);
+        }
+
+        .yukleme-ekip {
+            display: grid;
+            gap: 4px;
+            margin-top: 22px;
+            color: rgba(210, 238, 245, 0.72);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 17px;
+            font-weight: 500;
+            line-height: 1.25;
+            opacity: 1;
+        }
+
+        .yukleme-ekrani.ready .yukleme-baslat {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ═══════ Partikuller ═══════ */
+        .partikul-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 11;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--cyan);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-float linear infinite;
+        }
+
+        /* ═══════ ANIMATIONS ═══════ */
+        @keyframes pulse-ring {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(0, 255, 255, 0);
+            }
+        }
+
+        @keyframes scanline-shift {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 100px;
+            }
+        }
+
+        @keyframes glow-pulse {
+
+            0%,
+            100% {
+                opacity: 0.4;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes hex-spin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(0.85);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        @keyframes text-flicker {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            33% {
+                opacity: 0.7;
+            }
+
+            66% {
+                opacity: 1;
+            }
+
+            77% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes particle-float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px) scale(1);
+            }
+        }
+
+        /* ═══════ MAP UI OVERRIDES ═══════ */
+        .mapboxgl-ctrl-attrib {
+            display: none !important;
+        }
+
+        .mapboxgl-ctrl-logo {
+            opacity: 0.3 !important;
+        }
+
+        .mapboxgl-ctrl-group {
+            background: var(--dark-bg) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 10px !important;
+            overflow: hidden;
+        }
+
+        .mapboxgl-ctrl-group button {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .mapboxgl-ctrl-group button+button {
+            border-top: 1px solid rgba(0, 255, 255, 0.1) !important;
+        }
+
+        .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(150deg);
+        }
+
+
 
 
