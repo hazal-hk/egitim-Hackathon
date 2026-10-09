@@ -291,3 +291,445 @@
                     'text-halo-width': 1.8
                 }
             });
+            // dunya ulkeleri
+            const countryGeoJsonUrl = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
+            map.addSource('dunya-ulkeler', {
+                'type': 'geojson',
+                'data': { type: 'FeatureCollection', features: [] }
+            });
+            map.addSource('ulke-etiket-noktalari', {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            fetch(countryGeoJsonUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Ülke verisi yüklenemedi: ${response.status}`);
+                    return response.json();
+                })
+                .then(geoJson => {
+                    const seenCountryNames = new Set();
+                    const labelFeatures = geoJson.features.reduce((labels, feature) => {
+                        const properties = feature.properties || {};
+                        const countryName = properties.NAME;
+                        const longitude = Number(properties.LABEL_X);
+                        const latitude = Number(properties.LABEL_Y);
+
+                        if (!countryName || seenCountryNames.has(countryName) || !Number.isFinite(longitude) || !Number.isFinite(latitude)) {
+                            return labels;
+                        }
+
+                        seenCountryNames.add(countryName);
+                        labels.push({
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [longitude, latitude]
+                            },
+                            properties: {
+                                NAME: countryName,
+                                label: getCountryDisplayName(properties)
+                            }
+                        });
+                        return labels;
+                    }, []);
+
+                    map.getSource('dunya-ulkeler').setData(geoJson);
+                    map.getSource('ulke-etiket-noktalari').setData({
+                        type: 'FeatureCollection',
+                        features: labelFeatures
+                    });
+                })
+                .catch(error => console.error('Ülke harita verisi yüklenemedi:', error));
+
+            // ulkelerin ust dolgusu
+            map.addLayer({
+                'id': 'ulkeler-dolgu',
+                type: 'fill',
+                source: 'dunya-ulkeler',
+                paint: {
+                    'fill-color': '#00ffff',
+                    'fill-opacity': 0.02,
+                    'fill-opacity-transition': { duration: 1200 }
+                }
+            });
+
+            // Hover dolgusu
+            map.addLayer({
+                'id': 'ulkeler-hover',
+                type: 'fill',
+                source: 'dunya-ulkeler',
+                paint: {
+                    'fill-color': '#00ffff',
+                    'fill-opacity': 0.0,
+                    'fill-opacity-transition': { duration: 300 }
+                },
+                'filter': ['==', 'NAME', '']
+            });
+
+            // diger ulkeler karartma layeri
+            map.addLayer({
+                'id': 'diger-ulkeler-karartma',
+                type: 'fill',
+                source: 'dunya-ulkeler',
+                paint: {
+                    'fill-color': '#00040a',
+                    'fill-opacity': 0.0,
+                    'fill-opacity-transition': { duration: 1200 }
+                }
+            });
+
+            // secilen ulke vurgu
+            map.addLayer({
+                'id': 'secili-ulke-dolgu',
+                type: 'fill',
+                source: 'dunya-ulkeler',
+                paint: {
+                    'fill-color': '#00ffff',
+                    'fill-opacity': 0.0,
+                    'fill-opacity-transition': { duration: 1200 }
+                },
+                'filter': ['==', 'NAME', '']
+            });
+
+            // sinir cizgileri
+            map.addLayer({
+                'id': 'ulkeler-sinir',
+                'type': 'line',
+                'source': 'dunya-ulkeler',
+                'paint': {
+                    'line-color': '#00ffff',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 0.7,
+                        3, 1.1,
+                        5, 1.5,
+                        7, 1.9
+                    ],
+                    'line-opacity': countryBoundaryOpacityByZoom,
+                    'line-opacity-transition': { duration: 1200 },
+                    'line-blur': 0.3
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                }
+            });
+
+            // secilen ulke glow
+            map.addLayer({
+                'id': 'secili-ulke-glow',
+                'type': 'line',
+                'source': 'dunya-ulkeler',
+                'paint': {
+                    'line-color': '#00ffff',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 5,
+                        3, 7,
+                        5, 10,
+                        7, 12
+                    ],
+                    'line-opacity': 0.0,
+                    'line-blur': 5,
+                    'line-opacity-transition': { duration: 1000 }
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'filter': ['==', 'NAME', '']
+            });
+
+            // secilen ulke sinirlari
+            map.addLayer({
+                'id': 'secili-ulke-sinir',
+                'type': 'line',
+                'source': 'dunya-ulkeler',
+                'paint': {
+                    'line-color': '#00ffff',
+                    'line-width': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 2.0,
+                        3, 2.5,
+                        5, 3.2,
+                        7, 3.8
+                    ],
+                    'line-opacity': 0.0,
+                    'line-opacity-transition': { duration: 1000 }
+                },
+                'layout': {
+                    'line-cap': 'round',
+                    'line-join': 'round'
+                },
+                'filter': ['==', 'NAME', '']
+            });
+
+            // ulke isimleri
+            map.addLayer({
+                'id': 'ulkeler-isimler',
+                type: 'symbol',
+                source: 'ulke-etiket-noktalari',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Semibold', 'Arial Unicode MS Regular'],
+                    'text-size': [
+                        'interpolate', ['linear'], ['zoom'],
+                        1.5, 9,
+                        3, 11,
+                        5, 14
+                    ],
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false,
+                    'text-letter-spacing': 0.1
+                },
+                paint: {
+                    'text-color': '#ffffff',
+                    'text-opacity': countryLabelOpacityByZoom,
+                    'text-opacity-transition': { duration: 1500 },
+                    'text-halo-color': 'rgba(0, 0, 0, 0.7)',
+                    'text-halo-width': 1.5
+                }
+            });
+
+            // tekli isim
+            map.addSource('secili-ulke-nokta', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: []
+                }
+            });
+
+            // secilen ulke isim
+            map.addLayer({
+                'id': 'secili-ulke-isim',
+                type: 'symbol',
+                source: 'secili-ulke-nokta',
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Regular'],
+                    'text-size': ['coalesce', ['get', 'textSize'], 20],
+                    'text-anchor': 'center',
+                    'text-justify': 'center',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true,
+                    'text-letter-spacing': 0.05,
+                    'text-transform': 'uppercase'
+                },
+                paint: {
+                    'text-color': '#d9e6ee',
+                    'text-halo-color': 'rgba(0, 8, 18, 0.94)',
+                    'text-halo-width': 1.1,
+                    'text-halo-blur': 0.1,
+                    'text-opacity': 0.0,
+                    'text-opacity-transition': { duration: 800 }
+                }
+            });
+        });
+
+        // yazma animasyonu
+        let yazmaAnimasyonu;
+
+        function daktiloYaz(sablon, metinler, elementId, hiz) {
+            const templateElement = document.getElementById(`${elementId}-template`);
+            if (!templateElement) return;
+
+            templateElement.innerHTML = sablon;
+            const textSlots = [...templateElement.querySelectorAll('[data-text-slot]')];
+            const textValues = metinler.map(value => String(value ?? ''));
+            textSlots.forEach(slot => { slot.textContent = ''; });
+            clearInterval(yazmaAnimasyonu);
+
+            let slotIndex = 0;
+            let characterIndex = 0;
+            yazmaAnimasyonu = setInterval(() => {
+                while (slotIndex < textSlots.length && characterIndex >= textValues[slotIndex].length) {
+                    slotIndex++;
+                    characterIndex = 0;
+                }
+
+                if (slotIndex >= textSlots.length || slotIndex >= textValues.length) {
+                    clearInterval(yazmaAnimasyonu);
+                    return;
+                }
+
+                textSlots[slotIndex].textContent += textValues[slotIndex].charAt(characterIndex);
+                characterIndex++;
+            }, hiz);
+        }
+
+      
+        
+        // ═══════ TOOLTIP ═══════
+        const tooltip = document.getElementById('hover-tooltip');
+        let hoveredCountry = null;
+
+        map.on('mousemove', 'ulkeler-dolgu', (e) => {
+            const properties = e.features[0].properties;
+            const name = properties.NAME || properties.name;
+            const displayName = getCountryDisplayName(properties);
+            if (name && name !== hoveredCountry) {
+                hoveredCountry = name;
+                map.setFilter('ulkeler-hover', ['==', 'NAME', name]);
+                map.setPaintProperty('ulkeler-hover', 'fill-opacity', 0.11);
+            }
+
+            tooltip.textContent = displayName || '';
+            tooltip.style.left = (e.point.x + 16) + 'px';
+            tooltip.style.top = (e.point.y - 10) + 'px';
+            tooltip.classList.add('visible');
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'ulkeler-dolgu', () => {
+            hoveredCountry = null;
+            map.setFilter('ulkeler-hover', ['==', 'NAME', '']);
+            map.setPaintProperty('ulkeler-hover', 'fill-opacity', 0.0);
+            tooltip.classList.remove('visible');
+            map.getCanvas().style.cursor = '';
+        });
+
+        // deniz hover
+        let hoveredSea = null;
+        map.on('mousemove', 'denizler-dolgu', (e) => {
+            const seaInfo = getStaticSeaInformation(e.features[0]);
+            const seaName = seaInfo.displayName;
+            if (seaName && seaName !== hoveredSea) {
+                hoveredSea = seaName;
+                map.setFilter('denizler-hover', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], seaInfo.filterName]);
+                map.setPaintProperty('denizler-hover', 'fill-opacity', 0.12);
+            }
+
+            tooltip.textContent = `≋ ${seaName}`;
+            tooltip.style.left = (e.point.x + 16) + 'px';
+            tooltip.style.top = (e.point.y - 10) + 'px';
+            tooltip.classList.add('visible');
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'denizler-dolgu', () => {
+            hoveredSea = null;
+            map.setFilter('denizler-hover', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('denizler-hover', 'fill-opacity', 0.0);
+            tooltip.classList.remove('visible');
+            map.getCanvas().style.cursor = '';
+        });
+
+        const seaNameTranslations = {
+            'Arctic Ocean': 'Arktik Okyanusu',
+            'Mediterranean Sea': 'Akdeniz',
+            'Atlantic Ocean': 'Atlas Okyanusu',
+            'Pacific Ocean': 'Pasifik Okyanusu',
+            'Indian Ocean': 'Hint Okyanusu',
+            'Southern Ocean': 'Güney Okyanusu',
+            'North Atlantic Ocean': 'Kuzey Atlas Okyanusu',
+            'South Atlantic Ocean': 'Güney Atlas Okyanusu',
+            'North Pacific Ocean': 'Kuzey Pasifik Okyanusu',
+            'South Pacific Ocean': 'Güney Pasifik Okyanusu',
+            'Black Sea': 'Karadeniz',
+            'Red Sea': 'Kızıldeniz',
+            'Baltic Sea': 'Baltık Denizi',
+            'North Sea': 'Kuzey Denizi',
+            'Aegean Sea': 'Ege Denizi',
+            'Adriatic Sea': 'Adriyatik Denizi',
+            'Arabian Sea': 'Arap Denizi',
+            'Persian Gulf': 'Basra Körfezi',
+            'Gulf of Mexico': 'Meksika Körfezi',
+            'Bay of Bengal': 'Bengal Körfezi',
+            'Caribbean Sea': 'Karayip Denizi',
+            'South China Sea': 'Güney Çin Denizi',
+            'East China Sea': 'Doğu Çin Denizi',
+            'Sea of Japan': 'Japon Denizi',
+            'Philippine Sea': 'Filipin Denizi',
+            'Bering Sea': 'Bering Denizi',
+            'Barents Sea': 'Barents Denizi',
+            'Kara Sea': 'Kara Denizi',
+            'Laptev Sea': 'Laptev Denizi',
+            'Beaufort Sea': 'Beaufort Denizi',
+            'Norwegian Sea': 'Norveç Denizi',
+            'Greenland Sea': 'Grönland Denizi',
+            'Sea of Okhotsk': 'Ohotsk Denizi',
+            'Coral Sea': 'Mercan Denizi',
+            'Tasman Sea': 'Tasmanya Denizi',
+            'Caspian Sea': 'Hazar Denizi',
+            'Dead Sea': 'Ölü Deniz'
+        };
+        const seaSalinityEstimates = {
+            'Arctic Ocean': 30,
+            'Mediterranean Sea': 38,
+            'Atlantic Ocean': 35,
+            'Pacific Ocean': 35,
+            'Indian Ocean': 35,
+            'Southern Ocean': 34,
+            'Black Sea': 18,
+            'Red Sea': 40,
+            'Baltic Sea': 7,
+            'North Sea': 35,
+            'Aegean Sea': 39,
+            'Adriatic Sea': 38,
+            'Arabian Sea': 36,
+            'Persian Gulf': 40,
+            'Gulf of Mexico': 36,
+            'Bay of Bengal': 34,
+            'Caribbean Sea': 35,
+            'South China Sea': 34,
+            'East China Sea': 33,
+            'Sea of Japan': 34,
+            'Philippine Sea': 34,
+            'Bering Sea': 33,
+            'Barents Sea': 34,
+            'Kara Sea': 32,
+            'Laptev Sea': 30,
+            'Beaufort Sea': 28,
+            'Norwegian Sea': 35,
+            'Greenland Sea': 34,
+            'Sea of Okhotsk': 33,
+            'Coral Sea': 35,
+            'Tasman Sea': 35,
+            'Caspian Sea': 12,
+            'Dead Sea': 300
+        };
+        const seaDescriptionsTr = {
+            'Arctic Ocean': 'Arktik Okyanusu, Kuzey Kutbu çevresindeki soğuk ve sığ okyanustur. Nehirlerden gelen tatlı su ve deniz buzları yüzey tuzluluğunu düşürür.',
+            'Mediterranean Sea': 'Akdeniz; Avrupa, Afrika ve Asya arasında uzanır, Cebelitarık Boğazı üzerinden Atlas Okyanusu’na bağlanır.',
+            'Atlantic Ocean': 'Atlas Okyanusu, Avrupa ve Afrika ile Amerika kıtaları arasında yer alan dünyanın ikinci büyük okyanusudur.',
+            'Pacific Ocean': 'Pasifik Okyanusu, kıtalar arasındaki en büyük ve en derin okyanustur.',
+            'Indian Ocean': 'Hint Okyanusu; Afrika, Asya ve Avustralya arasında uzanır, muson rüzgârlarından güçlü biçimde etkilenir.',
+            'Southern Ocean': 'Güney Okyanusu, Antarktika’yı çevreler ve güçlü çevresel akıntısıyla diğer okyanusları birbirine bağlar.',
+            'Black Sea': 'Karadeniz, Avrupa ile Batı Asya arasında bulunan ve boğazlarla Akdeniz sistemine bağlanan iç denizdir.',
+            'Red Sea': 'Kızıldeniz, Afrika ile Arap Yarımadası arasındadır. Sıcak iklimi ve yüksek buharlaşması tuzluluğunu artırır.',
+            'Baltic Sea': 'Baltık Denizi, Kuzey Avrupa’da yer alır. Çok sayıda nehir ve sınırlı su alışverişi nedeniyle tuzluluğu düşüktür.',
+            'North Sea': 'Kuzey Denizi, Büyük Britanya ile Kuzey Avrupa kıyıları arasında, Atlas Okyanusu’na açık sığ bir denizdir.',
+            'Aegean Sea': 'Ege Denizi, Yunanistan ile Türkiye arasında, çok sayıda ada ve boğazla çevrili Akdeniz’in bir koludur.',
+            'Adriatic Sea': 'Adriyatik Denizi, İtalya Yarımadası ile Balkanlar arasında uzanan Akdeniz’in kuzey koludur.',
+            'Arabian Sea': 'Arap Denizi, Arap Yarımadası ile Hindistan arasında, Hint Okyanusu’nun kuzeybatı bölümünde bulunur.',
+            'Persian Gulf': 'Basra Körfezi, İran ile Arap Yarımadası arasında yer alır; sığ ve sıcak suları yüksek buharlaşma görür.',
+            'Gulf of Mexico': 'Meksika Körfezi, Kuzey Amerika kıyılarıyla çevrili, Karayip Denizi ve Atlas Okyanusu’na bağlı büyük bir körfezdir.',
+            'Bay of Bengal': 'Bengal Körfezi, Hint Okyanusu’nun kuzeydoğusunda bulunur ve büyük nehirlerin taşıdığı tatlı sudan etkilenir.',
+            'Caribbean Sea': 'Karayip Denizi, Orta Amerika ile Antiller arasında, Atlas Okyanusu’na bağlı tropikal bir denizdir.',
+            'South China Sea': 'Güney Çin Denizi, Güneydoğu Asya kıyıları ve adaları arasında uzanan önemli bir batı Pasifik denizidir.',
+            'East China Sea': 'Doğu Çin Denizi, Çin, Kore ve Japonya kıyıları arasında yer alan batı Pasifik denizidir.',
+            'Sea of Japan': 'Japon Denizi, Japonya ile Kore ve Rusya’nın doğu kıyıları arasında bulunur.',
+            'Philippine Sea': 'Filipin Denizi, Filipinler’in doğusunda bulunan, batı Pasifik’in derin denizlerinden biridir.'
+        };
+
+        function getStaticSeaInformation(feature) {
+            const properties = feature.properties || {};
+            const sourceName = properties.NAME || properties.name_en || properties.name || '';
+            const displayName = properties.NAME_TR || properties.name_tr || seaNameTranslations[sourceName] || 'Seçili deniz/okyanus';
+            const featureClass = String(properties.featurecla || properties.FEATURECLA || '').toLowerCase();
+            const type = featureClass.includes('ocean') ? 'Okyanus'
+                : featureClass.includes('gulf') || featureClass.includes('bay') ? 'Körfez'
+                    : featureClass.includes('strait') ? 'Boğaz'
+                        : featureClass.includes('sea') ? 'Deniz'
+                            : 'Su kütlesi';
+
+            return {
+                displayName,
+                filterName: properties.NAME_TR || properties.name_tr || properties.NAME || properties.name || displayName,
+                type,
+                salinity: seaSalinityEstimates[sourceName] ?? seaSalinityEstimates[displayName] ?? 35,
+                description: seaDescriptionsTr[sourceName] || `${displayName}, çevresindeki kıyılar ve açık denizlerle etkileşim içindeki bir su kütlesidir. Tuzluluğu konuma, mevsime ve tatlı su girişine göre değişir.`
+            };
+        }
