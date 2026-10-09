@@ -6,9 +6,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.CountryService>();
+
 var app = builder.Build();
 
-builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.CountryService>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
