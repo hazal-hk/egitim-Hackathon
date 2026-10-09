@@ -17,16 +17,17 @@
 </head>
 
 <body>
-    <!-- Yukleme ekrani -->
-    <div class="yukleme-ekrani" id="yukleme-ekrani">
-        <div class="yukleme-icerik">
-            <div class="yukleme-yazi yukleme-marka">GeoFlight</div>
-            <div class="yukleme-hex"></div>
-            <div class="yukleme-bar-container">
-                <div class="yukleme-bar" id="yukleme-bar"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <div class="loading-text loading-brand">GeoFlight</div>
+            <div class="loading-hex"></div>
+            <div class="loading-bar-container">
+                <div class="loading-bar" id="loading-bar"></div>
             </div>
-            <div class="yukleme-baslat">Başlamak için tıklayınız</div>
-            <div class="yukleme-ekip">
+            <div class="loading-start">Başlamak için tıklayın</div>
+            <div class="loading-authors">
                 <div>Hazal Karayiğit</div>
                 <div>Alper Tunga Amirahmadov</div>
                 <div>Ali Berk Bacaksız</div>
@@ -34,62 +35,65 @@
         </div>
     </div>
 
-<!-- Map -->
- <div id='harita'></div>
+    <!-- Map -->
+    <div id='map'></div>
 
-<!-- Scanline katman -->
- <div class="scanlines"></div>
+    <!-- Scanlines Overlay -->
+    <div class="scanlines"></div>
 
- <!-- Partikuller -->
-  <div class="partikul-container" id="partikuller"></div>
+    <!-- Particles -->
+    <div class="particles-container" id="particles"></div>
 
-<!--Kose parantezleri-->
+    <!-- Corner Brackets -->
     <div class="corner-bracket corner-tl"></div>
     <div class="corner-bracket corner-tr"></div>
     <div class="corner-bracket corner-bl"></div>
     <div class="corner-bracket corner-br"></div>
-<!-- Yukari HUD -->
- <div class="hud-yukari">
-    <div class="hud-logo">
-        <div class="hud-logo-icon"></div>
-        <span class="hud-logo-text">GeoFlight</span>
-    </div>  
-    <div class="hud-durum">
-        <div class="hud-durum-item" id="hud-zaman">--:--:--</div>
-    </div>  
- </div>
- <!-- Orta Hud-->
-<div class = "hud-orta">
-    <div class="hud-kordinatlar" id="hud-kordinatlar">LAT 0.0000 · LNG 0.0000</div>
-</div>
 
-<!--Pusula-->
-<div class="pusula" role="img" aria-label="Pusula">
-    <span class="pusula-cardinal pusula-north">N</span>
-    <span class="pusula-cardinal pusula-east">E</span>
-    <span class="pusula-cardinal pusula-south">S</span>
-    <span class="pusula-cardinal pusula-west">W</span>
-    <div class="pusula-needle" id="pusula-needle"></div>
-    <div class="pusula-pivot"></div>
-</div>
-
-<!-- Hover Tooltip -->
- <div class="hover-tooltip" id="hover-tooltip"></div>
- <!--Hologram bilgi kart-->
- <div id="hologram-kart" class = "hologram-kart">
-    <div class="kart-parlama-cizgisi"></div>
-    <button class="kart-kapat" id="kart-kapat" title="Kapat">✕</button>
-    <div class="kart-header">
-        <div class="kart-tag">Dünya Haritası</div>
-        <h2 class="kart-baslik" id="ulke-adi">--</h2>
-        <div class="kart-altyazi" id="kart-altyazi">// BÖLGE VERİSİ YÜKLENİYOR...</div>
-    </div>
-    <div class="kart-body">
-        <div class="kart-terminal" id="ulke-bilgi">
-            <div id="ulke-bilgi-icerik"></div>
+    <!-- Top HUD -->
+    <div class="hud-top">
+        <div class="hud-logo">
+            <div class="hud-logo-icon"></div>
+            <span class="hud-logo-text">GeoFlight</span>
+        </div>
+        <div class="hud-status">
+            <div class="hud-status-item" id="hud-time">--:--:--</div>
         </div>
     </div>
-    <div class="card-footer">
+
+    <!-- Bottom HUD -->
+    <div class="hud-bottom">
+        <div class="hud-coords" id="hud-coords">LAT 0.0000 · LNG 0.0000</div>
+    </div>
+
+    <!-- Compass -->
+    <div class="compass" role="img" aria-label="Pusula">
+        <span class="compass-cardinal compass-north">N</span>
+        <span class="compass-cardinal compass-east">E</span>
+        <span class="compass-cardinal compass-south">S</span>
+        <span class="compass-cardinal compass-west">W</span>
+        <div class="compass-needle" id="compass-needle"></div>
+        <div class="compass-pivot"></div>
+    </div>
+
+    <!-- Hover Tooltip -->
+    <div class="hover-tooltip" id="hover-tooltip"></div>
+
+    <!-- Hologram Info Card -->
+    <div id="hologram-card" class="hologram-card">
+        <div class="card-glow-line"></div>
+        <button class="card-close" id="card-close" title="Kapat">✕</button>
+        <div class="card-header">
+            <div class="card-tag">Küresel İstihbarat Ağı</div>
+            <h2 class="card-title" id="country-name">--</h2>
+            <div class="card-subtitle" id="card-subtitle">// BÖLGE VERİSİ YÜKLENİYOR...</div>
+        </div>
+        <div class="card-body">
+            <div class="card-terminal" id="country-info">
+                <div id="country-info-template"></div>
+            </div>
+        </div>
+        <div class="card-footer">
             <div class="stat-box">
                 <div class="stat-label">Sinyal</div>
                 <div class="stat-value" id="stat-signal">--</div>
@@ -104,7 +108,8 @@
             </div>
         </div>
     </div>
-     <script src="app.js"></script>
+
+    <script src="app.js"></script>
 </body>
 
 </html>

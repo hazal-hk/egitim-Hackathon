@@ -1,11 +1,11 @@
-    *,
+        *,
         *::before,
         *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         :root {
             --cyan: #00ffff;
             --cyan-dim: rgba(0, 255, 255, 0.3);
@@ -28,21 +28,21 @@
             font-family: 'Rajdhani', sans-serif;
         }
 
-        /*--Map--*/
-        #map{
+        /* ═══════ MAP ═══════ */
+        #map {
             width: 100vw;
             height: 100vh;
         }
 
-        /*-- Yukari hud bar -- */
-        .hud-yukari{
+        /* ═══════ TOP HUD BAR ═══════ */
+        .hud-top {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 56px;
             background: linear-gradient(180deg, rgba(0, 10, 25, 0.95) 0%, rgba(0, 10, 25, 0.0) 100%);
-            display:flex;
+            display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 28px;
@@ -50,135 +50,137 @@
             pointer-events: none;
         }
 
-        .hud-logo{
+        .hud-logo {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .hud-logo-icon{
+        .hud-logo-icon {
             width: 32px;
             height: 32px;
             border: 2px solid var(--cyan);
             border-radius: 50%;
-            display:flex;
+            display: flex;
             align-items: center;
+            justify-content: center;
             animation: pulse-ring 3s ease-in-out infinite;
             position: relative;
         }
-        .hud-logo-icon::before{
+
+        .hud-logo-icon::before {
             content: '';
-            width:10px;
+            width: 10px;
             height: 10px;
             background: var(--cyan);
             border-radius: 50%;
             box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan);
         }
 
-        .hud-logo-text{
-            font-family:'Orbitron', sans-serif;
+        .hud-logo-text {
+            font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             font-size: 14px;
             letter-spacing: 4px;
             color: var(--cyan);
             text-shadow: 0 0 20px var(--cyan-dim);
-            text-transform:uppercase;
+            text-transform: uppercase;
         }
 
-        .hud-durum{
-            display:flex;
+        .hud-status {
+            display: flex;
             align-items: center;
             gap: 20px;
         }
 
-        .hud-durum-item{
+        .hud-status-item {
             font-family: 'Share Tech Mono', monospace;
-            font-size:11px;
-            color: rgba(0,255,255,0.6);
+            font-size: 11px;
+            color: rgba(0, 255, 255, 0.6);
             letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        /*-- Orta Hud--*/
-
-        .hud-orta{
-            position:absolute;
+        /* ═══════ BOTTOM HUD ═══════ */
+        .hud-bottom {
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            right: 0;
             height: 44px;
             background: linear-gradient(0deg, rgba(0, 10, 25, 0.9) 0%, rgba(0, 10, 25, 0.0) 100%);
-            display:flex;
+            display: flex;
             align-items: flex-end;
             justify-content: center;
             padding-bottom: 12px;
-            z-index:20;
+            z-index: 20;
             pointer-events: none;
         }
 
-        .hud-kordinatlar{
+        .hud-coords {
             font-family: 'Share Tech Mono', monospace;
             font-size: 11px;
-            color:rgba(0, 255, 255, 0.45);
+            color: rgba(0, 255, 255, 0.45);
             letter-spacing: 2px;
         }
 
-        /*--kose parantezi--*/
-        .corner-bracket{
-            position:absolute;
-            width:40px;
-            height:40px;
+        /* ═══════ CORNER BRACKETS ═══════ */
+        .corner-bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
             z-index: 15;
-            pointer-events:none;
+            pointer-events: none;
         }
 
         .corner-bracket::before,
-        .corner-bracket::after{
+        .corner-bracket::after {
             content: '';
             position: absolute;
-            background:var(--cyan);
+            background: var(--cyan);
             opacity: 0.35;
         }
 
-        .corner-t1{
+        .corner-tl {
             top: 12px;
-            left:12px;
+            left: 12px;
         }
 
-        .corner-t1::before{
+        .corner-tl::before {
+            top: 0;
+            left: 0;
             width: 24px;
             height: 2px;
-            top:0;
-            left:0;
         }
 
-        .corner-t1::after{
+        .corner-tl::after {
+            top: 0;
+            left: 0;
             width: 2px;
             height: 24px;
-            top:0;
-            left:0;
         }
-        .corner-tr{
+
+        .corner-tr {
             top: 12px;
             right: 12px;
         }
 
-        .corner-tr::before{
-            top:0;
-            right:0;
+        .corner-tr::before {
+            top: 0;
+            right: 0;
             width: 24px;
             height: 2px;
         }
 
-        .corner-tr::after{
-            top:0;
-            right:0;
-            width:2px;
-            height:24px;
+        .corner-tr::after {
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 24px;
         }
+
         .corner-bl {
             bottom: 12px;
             left: 12px;
@@ -217,30 +219,30 @@
             height: 24px;
         }
 
-        /*-- scan line katman -- */
-
-        .scanlines{
-            position:absolute;
-            top:0;
-            left:0;
-            right:0;
+        /* ═══════ SCAN LINE OVERLAY ═══════ */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
             bottom: 0;
             pointer-events: none;
             z-index: 12;
-             background: repeating-linear-gradient(0deg,
+            background: repeating-linear-gradient(0deg,
                     transparent,
                     transparent 2px,
                     rgba(0, 255, 255, 0.015) 2px,
                     rgba(0, 255, 255, 0.015) 4px);
             animation: scanline-shift 8s linear infinite;
         }
-        
-        .pusula{
+
+        .compass {
             position: absolute;
             bottom: 24px;
-            left:24px;
-            width:100px;
-            border: 1px solid rgba(0,255,255,0.32);
+            left: 24px;
+            width: 100px;
+            height: 100px;
+            border: 1px solid rgba(0, 255, 255, 0.32);
             border-radius: 50%;
             background: radial-gradient(circle, rgba(0, 28, 42, 0.76), rgba(2, 8, 20, 0.58) 72%);
             box-shadow: 0 0 14px rgba(0, 255, 255, 0.12), inset 0 0 12px rgba(0, 255, 255, 0.08);
@@ -248,26 +250,27 @@
             pointer-events: none;
         }
 
-        .pusula::before{
+        .compass::before {
             content: '';
-            position:absolute;
+            position: absolute;
             inset: 7px;
-            border: 1px solid rgba(0,255,255,0.2);
+            border: 1px solid rgba(0, 255, 255, 0.2);
             border-radius: 50%;
             z-index: 0;
         }
 
-        .pusula::after{
+        .compass::after {
             content: '';
             position: absolute;
             inset: 12px;
-            border-radius:50%;
-             background: repeating-conic-gradient(rgba(0, 255, 255, 0.6) 0deg 1deg, transparent 1deg 15deg);
+            border-radius: 50%;
+            background: repeating-conic-gradient(rgba(0, 255, 255, 0.6) 0deg 1deg, transparent 1deg 15deg);
             mask: radial-gradient(circle, transparent 0 68%, #000 69% 73%, transparent 74%);
             opacity: 0.72;
             z-index: 1;
         }
-        .pusula-cardinal {
+
+        .compass-cardinal {
             position: absolute;
             z-index: 2;
             color: rgba(170, 245, 255, 0.72);
@@ -276,32 +279,32 @@
             text-shadow: 0 0 5px rgba(0, 255, 255, 0.55);
         }
 
-        .pusula-north {
+        .compass-north {
             top: 7px;
             left: 50%;
             color: var(--cyan);
             transform: translateX(-50%);
         }
 
-        .pusula-east {
+        .compass-east {
             right: 7px;
             top: 50%;
             transform: translateY(-50%);
         }
 
-        .pusula-south {
+        .compass-south {
             bottom: 7px;
             left: 50%;
             transform: translateX(-50%);
         }
 
-        .pusula-west {
+        .compass-west {
             left: 7px;
             top: 50%;
             transform: translateY(-50%);
         }
 
-        .pusula-needle {
+        .compass-needle {
             position: absolute;
             top: 21px;
             left: 50%;
@@ -313,8 +316,8 @@
             z-index: 3;
         }
 
-        .pusula-needle::before,
-        .pusula-needle::after {
+        .compass-needle::before,
+        .compass-needle::after {
             content: '';
             position: absolute;
             left: 50%;
@@ -323,7 +326,7 @@
             transform: translateX(-50%);
         }
 
-        .pusula-needle::before {
+        .compass-needle::before {
             top: 0;
             border-left: 7px solid transparent;
             border-right: 7px solid transparent;
@@ -331,7 +334,7 @@
             filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.65));
         }
 
-        .pusula-needle::after {
+        .compass-needle::after {
             bottom: 0;
             border-left: 5px solid transparent;
             border-right: 5px solid transparent;
@@ -339,7 +342,7 @@
             filter: drop-shadow(0 0 3px rgba(255, 0, 255, 0.45));
         }
 
-        .pusula-pivot {
+        .compass-pivot {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -353,9 +356,8 @@
             z-index: 4;
         }
 
-        /*-- Hologram Kart -- */
-
-        .hologram-kart{
+        /* ═══════ HOLOGRAM CARD ═══════ */
+        .hologram-card {
             position: absolute;
             top: 50%;
             right: -420px;
@@ -372,11 +374,10 @@
             transition: right 0.9s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 25;
             overflow: hidden;
-
         }
 
-        .hologram-kart::before{
-            content:'';
+        .hologram-card::before {
+            content: '';
             position: absolute;
             top: -1px;
             left: -1px;
@@ -391,33 +392,33 @@
             pointer-events: none;
             z-index: -1;
         }
-         .hologram-kart.show {
+
+        .hologram-card.show {
             right: 0;
         }
 
-        /*-- Kart Baslik --*/
-
-        .kart-header{
+        /* Card Header */
+        .card-header {
             padding: 28px 28px 0 28px;
             position: relative;
         }
 
-        .kart-header::after{
-            content:'';
-            position:absolute;
+        .card-header::after {
+            content: '';
+            position: absolute;
             bottom: 0;
-            left:28px;
-            right:28px;
-            height:1px;
-             background: linear-gradient(90deg,
+            left: 28px;
+            right: 28px;
+            height: 1px;
+            background: linear-gradient(90deg,
                     transparent,
                     var(--cyan-dim),
                     var(--magenta-dim),
                     transparent);
         }
 
-        .kart-tag{
-            font-family:'Orbitron', sans-serif;
+        .card-tag {
+            font-family: 'Orbitron', sans-serif;
             font-size: 9px;
             font-weight: 600;
             letter-spacing: 4px;
@@ -427,7 +428,7 @@
             text-shadow: 0 0 12px var(--magenta-dim);
         }
 
-        .kart-baslik{
+        .card-title {
             font-family: 'Oxanium', sans-serif;
             font-weight: 600;
             font-size: 26px;
@@ -439,17 +440,16 @@
             text-shadow: 0 0 3px rgba(0, 255, 255, 0.35), 0 0 9px rgba(0, 220, 255, 0.16);
         }
 
-        .kart-altyazi{
+        .card-subtitle {
             font-family: 'Share Tech Mono', monospace;
             font-size: 10px;
-            color: rgba(0, 255,255,0.5);
-            letter-spacing:2px;
-            padding-bottom:16px;
+            color: rgba(0, 255, 255, 0.5);
+            letter-spacing: 2px;
+            padding-bottom: 16px;
         }
 
-        /*--Kart Body--*/
-
-        .kart-body{
+        /* Card Body */
+        .card-body {
             max-height: 260px;
             overflow-y: auto;
             padding: 20px 8px 24px 28px;
@@ -457,18 +457,20 @@
             scrollbar-width: thin;
         }
 
-        .kart-body::-webkit-scrollbar{
+        .card-body::-webkit-scrollbar {
             width: 6px;
         }
 
-        .kart-body::-webkit-scrollbar-track{
-            background:rgba(0,10,20,0.4)
-        }
-        .kart-body::-webkit-scrollbar-thumb{
-            background: rgba(0,255,255,0.38)
+        .card-body::-webkit-scrollbar-track {
+            background: rgba(0, 10, 20, 0.4);
         }
 
-        .kart-terminal{
+        .card-body::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.38);
+            border-radius: 3px;
+        }
+
+        .card-terminal {
             font-family: 'Share Tech Mono', monospace;
             font-size: 12.5px;
             line-height: 1.9;
@@ -476,19 +478,20 @@
             min-height: 140px;
             position: relative;
         }
-        .kart-terminal .prompt {
+
+        .card-terminal .prompt {
             color: var(--cyan);
         }
 
-        .kart-terminal .highlight {
+        .card-terminal .highlight {
             color: var(--gold);
         }
 
-        .kart-terminal .warn {
+        .card-terminal .warn {
             color: var(--magenta);
         }
 
-        /*-- kart footer -- */
+        /* Card Footer Stats */
         .card-footer {
             padding: 0 28px 24px 28px;
             display: grid;
@@ -496,11 +499,11 @@
             gap: 12px;
         }
 
-        .hologram-kart.sea-mode .card-footer {
+        .hologram-card.sea-mode .card-footer {
             grid-template-columns: minmax(0, 1fr);
         }
 
-        .hologram-kart.sea-mode .card-footer .stat-box:nth-child(n + 2) {
+        .hologram-card.sea-mode .card-footer .stat-box:nth-child(n + 2) {
             display: none;
         }
 
@@ -535,8 +538,8 @@
             text-shadow: 0 0 10px var(--cyan-glow);
         }
 
-        /* Kart Glow Efekti */
-        .kart-glow-line {
+        /* Card Glow Line */
+        .card-glow-line {
             position: absolute;
             left: 0;
             top: 0;
@@ -551,9 +554,9 @@
             animation: glow-pulse 3s ease-in-out infinite;
         }
 
-        /* -- Kapat butonu -- */
-        .kart-kapat{
-            position:absolute;
+        /* ═══════ CLOSE BUTTON ═══════ */
+        .card-close {
+            position: absolute;
             top: 16px;
             right: 16px;
             width: 28px;
@@ -571,18 +574,17 @@
             transition: all 0.3s ease;
             z-index: 30;
             pointer-events: auto;
-
         }
-        .kart-kapat:hover {
+
+        .card-close:hover {
             border-color: var(--magenta);
             color: var(--magenta);
             background: rgba(255, 0, 255, 0.1);
             box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
         }
 
-         /* ═══════ HOVER TOOLTIP ═══════ */
-
-         .hover-tooltip {
+        /* ═══════ HOVER TOOLTIP ═══════ */
+        .hover-tooltip {
             position: absolute;
             pointer-events: none;
             background: var(--dark-bg);
@@ -603,18 +605,19 @@
             white-space: nowrap;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--cyan-glow);
         }
+
         .hover-tooltip.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* ═══════ Yukleme Ekrani ═══════ */
-        .yukleme-ekrani{
-            position:fixed;
-            top:0;
-            left:0;
-            width:100%;
-            height:100%;
+        /* ═══════ LOADING SCREEN ═══════ */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: #031429;
             z-index: 1000;
             display: flex;
@@ -622,13 +625,14 @@
             justify-content: center;
             transition: opacity 1.2s ease, visibility 1.2s ease;
         }
-        .yukleme-ekrani.hidden {
+
+        .loading-screen.hidden {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        .yukleme-icerik {
+        .loading-content {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -637,11 +641,11 @@
             text-align: center;
         }
 
-        .yukleme-ekrani.ready {
+        .loading-screen.ready {
             cursor: pointer;
         }
 
-        .yukleme-hex {
+        .loading-hex {
             width: 60px;
             height: 60px;
             border: 2px solid var(--cyan);
@@ -650,7 +654,7 @@
             position: relative;
         }
 
-        .yukleme-hex::before {
+        .loading-hex::before {
             content: '';
             position: absolute;
             inset: 6px;
@@ -658,7 +662,7 @@
             animation: hex-spin 2s ease-in-out infinite reverse;
         }
 
-        .yukleme-yazi {
+        .loading-text {
             font-family: 'Orbitron', sans-serif;
             font-size: 12px;
             font-weight: 600;
@@ -668,7 +672,7 @@
             animation: text-flicker 1.5s ease-in-out infinite;
         }
 
-        .yukleme-marka {
+        .loading-brand {
             margin-bottom: 28px;
             font-size: 20px;
             font-weight: 700;
@@ -677,7 +681,7 @@
             animation: none;
         }
 
-        .yukleme-bar-container {
+        .loading-bar-container {
             width: 220px;
             height: 2px;
             background: rgba(0, 255, 255, 0.1);
@@ -686,7 +690,7 @@
             overflow: hidden;
         }
 
-        .yukleme-bar {
+        .loading-bar {
             width: 0%;
             height: 100%;
             background: linear-gradient(90deg, var(--cyan), var(--magenta));
@@ -694,14 +698,14 @@
             box-shadow: 0 0 10px var(--cyan);
         }
 
-        .yukleme-baslat {
+        .loading-start {
             visibility: hidden;
             opacity: 0;
             transform: translateY(8px);
             transition: opacity 0.6s ease, transform 0.6s ease, visibility 0.6s ease;
         }
 
-        .yukleme-baslat {
+        .loading-start {
             margin-top: 24px;
             color: var(--cyan);
             font-family: 'Orbitron', sans-serif;
@@ -711,7 +715,7 @@
             text-shadow: 0 0 10px var(--cyan-dim);
         }
 
-        .yukleme-ekip {
+        .loading-authors {
             display: grid;
             gap: 4px;
             margin-top: 22px;
@@ -723,14 +727,14 @@
             opacity: 1;
         }
 
-        .yukleme-ekrani.ready .yukleme-baslat {
+        .loading-screen.ready .loading-start {
             visibility: visible;
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* ═══════ Partikuller ═══════ */
-        .partikul-container {
+        /* ═══════ PARTICLES ═══════ */
+        .particles-container {
             position: absolute;
             top: 0;
             left: 0;
@@ -751,7 +755,7 @@
             animation: particle-float linear infinite;
         }
 
-        /* ═══════ Animasyonlar ═══════ */
+        /* ═══════ ANIMATIONS ═══════ */
         @keyframes pulse-ring {
 
             0%,
@@ -840,7 +844,7 @@
             }
         }
 
-        /* ═══════ Harita Overridelar ═══════ */
+        /* ═══════ MAP UI OVERRIDES ═══════ */
         .mapboxgl-ctrl-attrib {
             display: none !important;
         }
@@ -868,7 +872,3 @@
         .mapboxgl-ctrl-group button .mapboxgl-ctrl-icon {
             filter: invert(1) sepia(1) saturate(5) hue-rotate(150deg);
         }
-
-
-
-

@@ -1,6 +1,6 @@
-// ═══════ Partikuller ═══════
+   // ═══════ PARTICLES ═══════
         (function createParticles() {
-            const container = document.getElementById('partikuller');
+            const container = document.getElementById('particles');
             for (let i = 0; i < 30; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
@@ -10,27 +10,27 @@
                 p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
                 if (Math.random() > 0.7) p.style.background = 'var(--magenta)';
                 container.appendChild(p);
+            }
+        })();
 
-                // ═══════ HUD CLOCK ═══════
+        // ═══════ HUD CLOCK ═══════
         function updateHudTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('hud-zaman').textContent = `${h}:${m}:${s} UTC+3`;
+            document.getElementById('hud-time').textContent = `${h}:${m}:${s} UTC+3`;
         }
         setInterval(updateHudTime, 1000);
         updateHudTime();
-            }
-        })();
 
-        // ═══════ Yukleme animasyonu ═══════
+        // ═══════ LOADING SIMULATION ═══════
         let loadProgress = 0;
-        const loadingScreen = document.getElementById('yukleme-ekrani');
+        const loadingScreen = document.getElementById('loading-screen');
         const loadInterval = setInterval(() => {
             loadProgress += Math.random() * 15 + 5;
             if (loadProgress > 100) loadProgress = 100;
-            document.getElementById('yukleme-bar').style.width = loadProgress + '%';
+            document.getElementById('loading-bar').style.width = loadProgress + '%';
             if (loadProgress >= 100) {
                 clearInterval(loadInterval);
                 const showStartPrompt = () => {
@@ -49,3 +49,43 @@
             if (!loadingScreen.classList.contains('ready') || event.button !== 0) return;
             loadingScreen.classList.add('hidden');
         });
+
+        // ═══════ MAP INIT ═══════
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYWxwZXJpdHRvNSIsImEiOiJjbXV4ZzZ4d3gwOTh3MnhzZmgxNmUwOGpvIn0.Izv0zJRodMPyWUY2CrB_SQ';
+
+        const baslangicMerkezi = [20, 15];
+        const baslangicZoom = 1.8;
+        const countryBoundaryOpacityByZoom = ['interpolate', ['linear'], ['zoom'], 1.5, 0.14, 3, 0.22, 5, 0.38, 7, 0.52];
+        const countryLabelOpacityByZoom = ['interpolate', ['linear'], ['zoom'], 1.5, 0.7, 2.5, 0.72, 3.5, 0.76, 5, 0.82, 6.5, 0.9, 7.5, 0.95];
+        const countryNameOverrides = {
+            'Bhutan': 'Butan',
+            'Brunei': 'Brunei Darüsselam',
+            'Curaçao': 'Kurasao',
+            'Åland': 'Aland Adaları'
+        };
+
+        function getCountryDisplayName(properties) {
+            const sourceName = properties.NAME || properties.name || '';
+            return countryNameOverrides[sourceName] || properties.NAME_TR || properties.name_tr || sourceName;
+        }
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: baslangicMerkezi,
+            zoom: baslangicZoom,
+            minZoom: 1.5,
+            maxZoom: 7.5,
+            pitch: 35,
+            minPitch: 10,
+            maxPitch: 60,
+            antialias: true,
+            optimizeForTerrain: true
+        });
+        let terrainEnabled = true;
+        const compassNeedle = document.getElementById('compass-needle');
+        const updateCompassBearing = () => {
+            if (compassNeedle) compassNeedle.style.transform = `rotate(${-map.getBearing()}deg)`;
+        };
+        map.on('rotate', updateCompassBearing);
+        updateCompassBearing();
