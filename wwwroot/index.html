@@ -9,9 +9,8 @@
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Oxanium:wght@500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Oxanium:wght@500;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+          rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,9 +20,9 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loading-screen">
         <div class="loading-content">
-            <!-- Logo Buraya Eklendi -->
+            <!-- LOGO BURAYA EKLENİYOR -->
             <img src="logo.png" alt="GeoFlight Logo" class="loading-logo">
-            
+
             <div class="loading-text loading-brand"></div>
             <div class="loading-hex"></div>
             <div class="loading-bar-container">
@@ -54,15 +53,31 @@
     <div class="corner-bracket corner-br"></div>
 
     <!-- Top HUD -->
-    <!-- Top HUD -->
-<div class="hud-top">
-    <div class="hud-logo">
-        <img src="logo.png" alt="GeoFlight Logo" class="hud-top-logo">
+    <div class="hud-top">
+        <div class="hud-logo">
+            <img src="logo.png" alt="GeoFlight Logo" class="hud-top-logo">
+        </div>
+
+        <!-- Dünya Saatleri Açılır Menü Alanı -->
+        <div class="hud-status" id="world-clock-container">
+            <div class="hud-status-item world-clock-btn" id="world-clock-toggle" title="Dünya Saatleri İçin Tıklayın">
+                <span id="hud-city-name">İSTANBUL</span>
+                <span id="hud-time">--:--:--</span>
+                <span class="clock-arrow">▼</span>
+            </div>
+
+            <!-- Açılır Küçük Panel -->
+            <div class="world-clock-dropdown" id="world-clock-dropdown">
+                <div class="dropdown-header">// ZAMAN DİLİMİ SEÇİCİ</div>
+                <div class="city-time-option" data-timezone="Europe/Istanbul" data-city="İSTANBUL"><span>İstanbul (TR)</span><span class="city-time">--:--</span></div>
+                <div class="city-time-option" data-timezone="Europe/London" data-city="LONDRA"><span>Londra (UK)</span><span class="city-time">--:--</span></div>
+                <div class="city-time-option" data-timezone="America/New_York" data-city="NEW YORK"><span>New York (US)</span><span class="city-time">--:--</span></div>
+                <div class="city-time-option" data-timezone="Asia/Tokyo" data-city="TOKYO"><span>Tokyo (JP)</span><span class="city-time">--:--</span></div>
+                <div class="city-time-option" data-timezone="Asia/Dubai" data-city="DÜBAİ"><span>Dubai (AE)</span><span class="city-time">--:--</span></div>
+                <div class="city-time-option" data-timezone="Australia/Sydney" data-city="SİDNEY"><span>Sidney (AU)</span><span class="city-time">--:--</span></div>
+            </div>
+        </div>
     </div>
-    <div class="hud-status">
-        <div class="hud-status-item" id="hud-time">--:--:--</div>
-    </div>
-</div>
 
     <!-- Bottom HUD -->
     <div class="hud-bottom">
