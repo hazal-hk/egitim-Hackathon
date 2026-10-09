@@ -12,6 +12,15 @@ builder.Services.AddScoped<Hackaton.Service.ICountryService, Hackaton.Service.Co
 builder.Services.AddScoped<Hackaton.Service.ICategoryService, Hackaton.Service.CategoryService>();
 builder.Services.AddScoped<ICountryContentService, CountryContentService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,6 +30,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
+
+app.UseDefaultFiles(); // index.html'i varsayýlan sayfa yapar
+app.UseStaticFiles();  // css ve js dosyalarýnýn okunmasýna izin verir
 
 app.UseAuthorization();
 
