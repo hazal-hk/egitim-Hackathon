@@ -53,44 +53,23 @@
         .hud-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            pointer-events: auto;
+            margin-left: -30px;
+            margin-top: 22px;
         }
 
-        .hud-logo-icon {
-            width: 32px;
-            height: 32px;
-            border: 2px solid var(--cyan);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse-ring 3s ease-in-out infinite;
-            position: relative;
-        }
-
-        .hud-logo-icon::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background: var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan);
-        }
-
-        .hud-logo-text {
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 4px;
-            color: var(--cyan);
-            text-shadow: 0 0 20px var(--cyan-dim);
-            text-transform: uppercase;
+        /* Yeni Eklenen Logo Stili */
+        .hud-top-logo {
+            height: 48px;     /* Sol üst köşe için ideal küçük yükseklik */
+            width: auto;      /* Orantılı kalması için */
+            filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5)); /* Hologram temalı parlama */
         }
 
         .hud-status {
             display: flex;
             align-items: center;
             gap: 20px;
+            pointer-events: auto;
         }
 
         .hud-status-item {
@@ -102,6 +81,13 @@
             align-items: center;
             gap: 6px;
         }
+
+        .loading-logo {
+    width: 550px;     /* Logonun genişliği (gönlünüze göre 80px, 100px veya 120px yapabilirsiniz) */
+    height: auto;     /* Orantılı küçülmesi için */
+    margin-bottom: 15px; /* Yazıyla arasına boşluk bırakır */
+    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.5)); /* Hologram temasına uygun parlama efekti */
+}
 
         /* ═══════ BOTTOM HUD ═══════ */
         .hud-bottom {
@@ -712,16 +698,20 @@
         }
 
         .loading-authors {
-            display: grid;
-            gap: 4px;
-            margin-top: 22px;
-            color: rgba(210, 238, 245, 0.72);
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 17px;
-            font-weight: 500;
-            line-height: 1.25;
-            opacity: 1;
-        }
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Yazıları sağa hizalar */
+    gap: 4px;
+    color: rgba(210, 238, 245, 0.72);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.25;
+    opacity: 1;
+}
 
         .loading-screen.ready .loading-start {
             visibility: visible;
