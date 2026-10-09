@@ -1,4 +1,4 @@
-       // ═══════ PARTICLES ═══════
+        // ═══════ PARTICLES ═══════
         (function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 30; i++) {
@@ -143,13 +143,14 @@
                     'fill-opacity': 1
                 }
             });
-            // Denizler ve okyanuslar
+
+            // ═══════ DÜNYA DENİZLERİ VE OKYANUSLARI (Natural Earth 50m Marine Polygons) ═══════
             map.addSource('dunya-denizler', {
                 'type': 'geojson',
                 'data': 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_geography_marine_polys.geojson'
             });
 
-            // Denizlerin ic dolgusu
+            // Denizlerin iç dolgusu (holografik okyanus derinlik tonu)
             map.addLayer({
                 'id': 'denizler-dolgu',
                 'type': 'fill',
@@ -174,7 +175,7 @@
                 'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
             });
 
-            // Secilen deniz dolgusu
+            // Seçilen deniz dolgusu
             map.addLayer({
                 'id': 'secili-deniz-dolgu',
                 'type': 'fill',
@@ -187,7 +188,7 @@
                 'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
             });
 
-            // Deniz sinirlari glow efekti
+            // Deniz sınırları dış ışıması (Soft bathymetric glow)
             map.addLayer({
                 'id': 'denizler-sinir-glow',
                 'type': 'line',
@@ -204,7 +205,7 @@
                 }
             });
 
-            // Deniz ve okyanus sinir cizgileri
+            // Deniz ve okyanus sınır çizgileri (Taktiksel kesikli su sınırları)
             map.addLayer({
                 'id': 'denizler-sinir',
                 'type': 'line',
@@ -227,7 +228,7 @@
                 }
             });
 
-            // secilen denize glow efekti
+            // Seçilen denizin dış ışıması (Glow Aura)
             map.addLayer({
                 'id': 'secili-deniz-glow',
                 'type': 'line',
@@ -246,7 +247,7 @@
                 'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
             });
 
-            // secilen deniz siniri glow
+            // Seçilen denizin parlayan sınırı
             map.addLayer({
                 'id': 'secili-deniz-sinir',
                 'type': 'line',
@@ -264,7 +265,7 @@
                 'filter': ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']
             });
 
-            // deniz ve okyanus isimleri
+            // Deniz ve Okyanus İsimleri (Ülke etiketleriyle aynı tipografide)
             map.addLayer({
                 'id': 'denizler-isimler',
                 'type': 'symbol',
@@ -291,7 +292,8 @@
                     'text-halo-width': 1.8
                 }
             });
-            // dunya ulkeleri
+
+            // ═══════ DÜNYA ÜLKELERİ GEOJSON KAYNAĞI (Natural Earth 50m - Yüksek Çözünürlüklü ve Kıvrımlı) ═══════
             const countryGeoJsonUrl = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
             map.addSource('dunya-ulkeler', {
                 'type': 'geojson',
@@ -342,7 +344,7 @@
                 })
                 .catch(error => console.error('Ülke harita verisi yüklenemedi:', error));
 
-            // ulkelerin ust dolgusu
+            // Ülkelerin iç dolgusu (transparan holografik parıltı)
             map.addLayer({
                 'id': 'ulkeler-dolgu',
                 type: 'fill',
@@ -367,7 +369,7 @@
                 'filter': ['==', 'NAME', '']
             });
 
-            // diger ulkeler karartma layeri
+            // Diğer ülkeleri karartma katmanı (Seçili ülke haricindeki tüm karaları pürüzsüzce karartır)
             map.addLayer({
                 'id': 'diger-ulkeler-karartma',
                 type: 'fill',
@@ -379,7 +381,7 @@
                 }
             });
 
-            // secilen ulke vurgu
+            // Seçilen ülke vurgu dolgusu
             map.addLayer({
                 'id': 'secili-ulke-dolgu',
                 type: 'fill',
@@ -392,7 +394,8 @@
                 'filter': ['==', 'NAME', '']
             });
 
-            // sinir cizgileri
+            // ═══════ KUSURSUZ SINIR ÇİZGİLERİ (Aynı geometriden - kıyılarda ve sınırlarda sıfır bozulma) ═══════
+            // Genel ülke sınırları (Kıyılar ve sınırlar düzgün eğrilerle çizilir)
             map.addLayer({
                 'id': 'ulkeler-sinir',
                 'type': 'line',
@@ -416,7 +419,7 @@
                 }
             });
 
-            // secilen ulke glow
+            // Seçilen ülkenin dış ışıması (Hologram Glow Aura)
             map.addLayer({
                 'id': 'secili-ulke-glow',
                 'type': 'line',
@@ -441,7 +444,7 @@
                 'filter': ['==', 'NAME', '']
             });
 
-            // secilen ulke sinirlari
+            // Seçilen ülkenin parlak net sınırı (Bozulmasız, kıvrımlı ve tam poligon kenarında)
             map.addLayer({
                 'id': 'secili-ulke-sinir',
                 'type': 'line',
@@ -465,7 +468,7 @@
                 'filter': ['==', 'NAME', '']
             });
 
-            // ulke isimleri
+            // Ülke isimleri
             map.addLayer({
                 'id': 'ulkeler-isimler',
                 type: 'symbol',
@@ -492,7 +495,7 @@
                 }
             });
 
-            // tekli isim
+            // Tekil seçili ülke merkez noktası kaynağı (büyük ülkelerde birden fazla isim çıkmasını önler)
             map.addSource('secili-ulke-nokta', {
                 type: 'geojson',
                 data: {
@@ -501,7 +504,7 @@
                 }
             });
 
-            // secilen ulke isim
+            // Seçilen ülke ismi (tekil ve sınırların tam ortasında büyük olarak gösterilir)
             map.addLayer({
                 'id': 'secili-ulke-isim',
                 type: 'symbol',
@@ -528,7 +531,7 @@
             });
         });
 
-        // yazma animasyonu
+        // ═══════ TYPEWRITER EFFECT ═══════
         let yazmaAnimasyonu;
 
         function daktiloYaz(sablon, metinler, elementId, hiz) {
@@ -559,8 +562,20 @@
             }, hiz);
         }
 
-      
-        
+        // ═══════ RANDOM STAT VALUES ═══════
+        function randomStats() {
+            const signals = ['98.2%', '97.5%', '99.1%', '96.8%', '95.4%'];
+            const threats = ['DÜŞÜK', 'ORTA', 'YOK', 'DÜŞÜK', 'BELİRSİZ'];
+            const statuses = ['AKTİF', 'İZLEME', 'TARAMA', 'AKTİF', 'BAĞLI'];
+
+            document.getElementById('stat-signal').textContent = signals[Math.floor(Math.random() * signals.length)];
+            const threatEl = document.getElementById('stat-threat');
+            const threat = threats[Math.floor(Math.random() * threats.length)];
+            threatEl.textContent = threat;
+            threatEl.style.color = threat === 'ORTA' ? 'var(--gold)' : threat === 'BELİRSİZ' ? 'var(--magenta)' : 'var(--neon-green)';
+            document.getElementById('stat-status').textContent = statuses[Math.floor(Math.random() * statuses.length)];
+        }
+
         // ═══════ TOOLTIP ═══════
         const tooltip = document.getElementById('hover-tooltip');
         let hoveredCountry = null;
@@ -590,7 +605,7 @@
             map.getCanvas().style.cursor = '';
         });
 
-        // deniz hover
+        // ═══════ DENİZ HOVER TOOLTIP ═══════
         let hoveredSea = null;
         map.on('mousemove', 'denizler-dolgu', (e) => {
             const seaInfo = getStaticSeaInformation(e.features[0]);
@@ -733,6 +748,8 @@
                 description: seaDescriptionsTr[sourceName] || `${displayName}, çevresindeki kıyılar ve açık denizlerle etkileşim içindeki bir su kütlesidir. Tuzluluğu konuma, mevsime ve tatlı su girişine göre değişir.`
             };
         }
+
+        // ═══════ DÜNYA BOYUTU SARMA (Antimeridyen / Pasifik kesintisiz uçuş) ═══════
         function getUnwrappedTargetLng(targetLng, currentLng) {
             let diff = (targetLng - currentLng) % 360;
             if (diff > 180) diff -= 360;
@@ -740,7 +757,7 @@
             return currentLng + diff;
         }
 
-        // ulkenin tam ortasini bulma
+        // ═══════ ÜLKE SINIRLARININ TAM ORTA NOKTASI VE BOUNDS HESAPLAMA ═══════
         function getUlkeSinirMerkeziVeBounds(feature, fallbackLngLat) {
             const fallbackPoint = fallbackLngLat ? [fallbackLngLat.lng, fallbackLngLat.lat] : [0, 0];
             if (!feature || !feature.geometry) {
@@ -778,11 +795,11 @@
                     };
                 }
 
-                // en buyuk kara barcasini bul
+                // En büyük ana kara parçasını bul
                 poligonListesi.sort((a, b) => b.alan - a.alan);
                 const enBuyuk = poligonListesi[0];
 
-                // 180 meridyeni asan ulkeler
+                // Antimeridyen (180 meridyeni) aşan veya çok parçalı ülkeler (örneğin Rusya, ABD vb.):
                 if (enBuyuk.minX >= 0 && enBuyuk.alan > 80) {
                     anaPoligonlar = poligonListesi
                         .filter(p => p.minX >= 0 && p.alan > enBuyuk.alan * 0.005)
@@ -802,7 +819,7 @@
                 }
             }
 
-            // sinir kutusunu hesapla
+            // Seçilen ana sınırların sınır kutusunu (bounding box) hesapla
             let minLng = Infinity, maxLng = -Infinity, minLat = Infinity, maxLat = -Infinity;
             anaPoligonlar.forEach(halka => {
                 halka.forEach(pt => {
@@ -813,7 +830,7 @@
                 });
             });
 
-            // sinirlarin tam ortasi
+            // Sınırların tam ortası
             const centerLng = (minLng + maxLng) / 2;
             const centerLat = (minLat + maxLat) / 2;
             const bounds = new mapboxgl.LngLatBounds([minLng, minLat], [maxLng, maxLat]);
@@ -824,7 +841,7 @@
             };
         }
 
-        // deniz sinirlarnin merkezi
+        // ═══════ DENİZ SINIRLARININ MERKEZİ VE BOUNDS HESAPLAMA (Tıklanan Yakaya Özel) ═══════
         function getDenizSinirMerkeziVeBounds(feature, clickLngLat) {
             const rawLng = clickLngLat ? clickLngLat.lng : 0;
             const clickLat = clickLngLat ? clickLngLat.lat : 0;
@@ -857,7 +874,7 @@
                     };
                 }
 
-                //okyanus bul
+                // Tıklanan boylamın içinde kaldığı okyanus parçasını seç (Örn: Rusya tarafı [120, 180] veya Amerika tarafı [-180, -77])
                 let secilen = parcalar.find(p =>
                     normLng >= p.minX - 3 && normLng <= p.maxX + 3 &&
                     clickLat >= p.minY - 3 && clickLat <= p.maxY + 3
@@ -1020,4 +1037,412 @@
 
                 countryOrbitFrame = requestAnimationFrame(tick);
             }
+        }
+
+        // ═══════ CLICK: ÜLKEYE TIKLAMA ═══════
+        const handledMapLayerClicks = new WeakSet();
+        map.on('click', 'ulkeler-dolgu', (e) => {
+            if (e.originalEvent) handledMapLayerClicks.add(e.originalEvent);
+            const feature = e.features[0];
+            const ulkeAdi = feature.properties.NAME || feature.properties.name;
+            const ulkeGorunenAdi = getCountryDisplayName(feature.properties);
+            const sameCountryFocus = lastFocusedCountryName === ulkeAdi && countryOrbitState.active;
+            if (sameCountryFocus) {
+                if (countryOrbitState.paused) resumeCountryOrbit();
+                return;
+            }
+
+            const selectionToken = ++countrySelectionToken;
+            stopCountryOrbit();
+            countryFocusOrbitTarget = null;
+            spacePausedCountryOrbit = false;
+            lastFocusedCountryName = ulkeAdi;
+            map.setPaintProperty('secili-ulke-isim', 'text-opacity-transition', { duration: 0 });
+            map.setPaintProperty('secili-ulke-isim', 'text-opacity', 0);
+
+            // Deniz vurgularını temizle
+            map.setFilter('secili-deniz-dolgu', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-dolgu', 'fill-opacity', 0.0);
+            map.setFilter('secili-deniz-sinir', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-sinir', 'line-opacity', 0.0);
+            map.setFilter('secili-deniz-glow', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-glow', 'line-opacity', 0.0);
+
+            // Stat etiketlerini ülke moduna geri al
+            const statLabels = document.querySelectorAll('.card-footer .stat-label');
+            if (statLabels[0]) statLabels[0].textContent = 'Sinyal';
+            if (statLabels[1]) statLabels[1].textContent = 'Tehdit';
+            if (statLabels[2]) statLabels[2].textContent = 'Durum';
+
+            // Ülkenin sınırlarının tam ortasını ve ideal kamera çerçevesini hesapla
+            const geoBilgi = getUlkeSinirMerkeziVeBounds(feature, e.lngLat);
+            let bounds = geoBilgi.bounds;
+            const tamOrtaNokta = geoBilgi.center;
+            let labelPoints = [{ coordinates: tamOrtaNokta, textSize: 20 }];
+
+            if (ulkeAdi === 'United States of America' || ulkeAdi === 'United States') {
+                const normalizedClickLng = ((e.lngLat.lng + 180) % 360 + 360) % 360 - 180;
+                const clickedAlaska = e.lngLat.lat >= 50 && (normalizedClickLng <= -130 || normalizedClickLng >= 170);
+                labelPoints = [
+                    { coordinates: [-98, 39], textSize: 20 },
+                    { coordinates: [-152, 64], textSize: 12 }
+                ];
+
+                if (clickedAlaska) {
+                    const alaskaWestLng = getUnwrappedTargetLng(-180, e.lngLat.lng);
+                    bounds = new mapboxgl.LngLatBounds([alaskaWestLng, 50], [alaskaWestLng + 52, 72]);
+                } else {
+                    bounds = new mapboxgl.LngLatBounds([-179, 24], [-66, 72]);
+                }
+            } else if (ulkeAdi === 'Russia') {
+                bounds = new mapboxgl.LngLatBounds([19, 41], [180, 82]);
+                labelPoints = [{ coordinates: [100, 60], textSize: 20 }];
+            }
+
+            // Karartma ve seçim filtreleri
+            map.setFilter('diger-ulkeler-karartma', ['!=', 'NAME', ulkeAdi]);
+            map.setPaintProperty('diger-ulkeler-karartma', 'fill-opacity', 0.82);
+            map.setFilter('secili-ulke-dolgu', ['==', 'NAME', ulkeAdi]);
+            map.setPaintProperty('secili-ulke-dolgu', 'fill-opacity', 0.08);
+
+            // Diğer ülke sınırlarını hafif soluklaştır, seçili ülkenin sınırlarını parlat ve dış ışıma ver
+            map.setPaintProperty('ulkeler-sinir', 'line-opacity', 0.15);
+            map.setFilter('secili-ulke-sinir', ['==', 'NAME', ulkeAdi]);
+            map.setPaintProperty('secili-ulke-sinir', 'line-opacity', 1.0);
+            map.setFilter('secili-ulke-glow', ['==', 'NAME', ulkeAdi]);
+            map.setPaintProperty('secili-ulke-glow', 'line-opacity', 0.4);
+
+            // Genel isimleri gizle
+            map.setPaintProperty('ulkeler-isimler', 'text-opacity', 0.0);
+
+            // TEKİL İSİM: Sınırların tam ortasına tek bir nokta koyuyoruz (Rusya'da tam orta Sibirya merkezine oturur)
+            const noktaKaynagi = map.getSource('secili-ulke-nokta');
+            if (noktaKaynagi) {
+                noktaKaynagi.setData({
+                    type: 'FeatureCollection',
+                    features: labelPoints.map(labelPoint => ({
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: labelPoint.coordinates
+                        },
+                        properties: {
+                            name: ulkeGorunenAdi,
+                            textSize: labelPoint.textSize
+                        }
+                    }))
+                });
+            }
+
+            // Kameraya uç (En kısa küre rotasıyla unwrap ederek)
+            const optimumKamera = map.cameraForBounds(bounds, {
+                padding: { top: 60, bottom: 60, left: 60, right: 420 },
+                pitch: 45
+            });
+
+            const currentLng = map.getCenter().lng;
+            const targetLng = getUnwrappedTargetLng(optimumKamera.center.lng, currentLng);
+            const finalZoom = Math.min(optimumKamera.zoom - 0.2, 6.5);
+            const orbitCenter = [targetLng, optimumKamera.center.lat];
+            countryFocusOrbitTarget = { center: orbitCenter, zoom: finalZoom };
+
+            map.flyTo({
+                center: orbitCenter,
+                zoom: finalZoom,
+                pitch: 45,
+                bearing: 0,
+                speed: 1.2,
+                curve: 1,
+                essential: true
+            });
+
+            map.once('moveend', () => {
+                if (selectionToken !== countrySelectionToken) return;
+
+                map.setPaintProperty('secili-ulke-isim', 'text-opacity-transition', { duration: 800 });
+                map.setPaintProperty('secili-ulke-isim', 'text-opacity', 1);
+
+                const kart = document.getElementById('hologram-card');
+                document.getElementById('country-name').textContent = ulkeGorunenAdi;
+                document.getElementById('card-subtitle').textContent = `// BÖLGE: ${ulkeGorunenAdi.toLocaleUpperCase('tr-TR')} · BAĞLANTI KURULDU`;
+                kart.classList.remove('sea-mode');
+                kart.classList.add('show');
+                randomStats();
+
+                const orbitKey = getOrbitKey(orbitCenter, finalZoom);
+                const sameTarget = countryOrbitState.active && countryOrbitState.key === orbitKey;
+
+                if (!sameTarget) {
+                    startCountryOrbit(orbitCenter, finalZoom);
+                } else if (countryOrbitState.paused) {
+                    resumeCountryOrbit();
+                }
+
+                const ornekSablon = `<span class="prompt">&gt;</span> <span data-text-slot></span><br><br><span class="prompt">&gt;</span> <span data-text-slot></span><span class="highlight" data-text-slot></span><br><span class="prompt">&gt;</span> <span data-text-slot></span><span class="warn" data-text-slot></span>.<br><br><span data-text-slot></span>`;
+                const ornekIcerik = [
+                    'GLOBAL BAĞLANTI KURULDU.',
+                    'BÖLGE: ',
+                    ulkeGorunenAdi,
+                    'DURUM: ',
+                    'Uydu ve coğrafi tarama aktif',
+                    'Seçilen bölgenin stratejik, coğrafi ve eğitim verileri yükleniyor...'
+                ];
+                setTimeout(() => {
+                    daktiloYaz(ornekSablon, ornekIcerik, 'country-info', 25);
+                }, 400);
+            });
+        });
+
+        // ═══════ CLICK: DENİZ / OKYANUSA TIKLAMA ═══════
+        function handleSeaSelection(feature, clickLngLat) {
+            const seaInfo = getStaticSeaInformation(feature);
+            const seaName = seaInfo.displayName;
+            clearInterval(yazmaAnimasyonu);
+
+            stopCountryOrbit();
+
+            // Ülke seçimlerini ve karartmayı temizle
+            map.setFilter('secili-ulke-dolgu', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-dolgu', 'fill-opacity', 0.0);
+            map.setFilter('secili-ulke-sinir', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-sinir', 'line-opacity', 0.0);
+            map.setFilter('secili-ulke-glow', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-glow', 'line-opacity', 0.0);
+            map.setPaintProperty('diger-ulkeler-karartma', 'fill-opacity', 0.0);
+            map.setPaintProperty('ulkeler-sinir', 'line-opacity', 0.35);
+
+            // Deniz vurgu ve ışıma katmanlarını etkinleştir
+            const seaNameExpression = ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']];
+            map.setFilter('secili-deniz-dolgu', ['==', seaNameExpression, seaInfo.filterName]);
+            map.setPaintProperty('secili-deniz-dolgu', 'fill-opacity', 0.15);
+            map.setFilter('secili-deniz-sinir', ['==', seaNameExpression, seaInfo.filterName]);
+            map.setPaintProperty('secili-deniz-sinir', 'line-opacity', 1.0);
+            map.setFilter('secili-deniz-glow', ['==', seaNameExpression, seaInfo.filterName]);
+            map.setPaintProperty('secili-deniz-glow', 'line-opacity', 0.45);
+
+            // Sınır ve merkez hesapla (Tıklanan yakaya göre: Rusya sağı veya Amerika solu)
+            const geoBilgi = getDenizSinirMerkeziVeBounds(feature, clickLngLat);
+            const bounds = geoBilgi.bounds;
+            const tamOrtaNokta = geoBilgi.center;
+            // Tekil isim etiketi
+            const noktaKaynagi = map.getSource('secili-ulke-nokta');
+            if (noktaKaynagi) {
+                noktaKaynagi.setData({
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: tamOrtaNokta
+                        },
+                        properties: {
+                            name: seaName
+                        }
+                    }]
+                });
+            }
+
+            // Kamerayı denize uçur (Pasifik/Antimeridyen unwrap desteğiyle en kısa yöne doğru)
+            const optimumKamera = map.cameraForBounds(bounds, {
+                padding: { top: 60, bottom: 60, left: 60, right: 420 },
+                pitch: 45
+            });
+
+            const currentLng = map.getCenter().lng;
+            const targetLng = getUnwrappedTargetLng(optimumKamera.center.lng, currentLng);
+            const finalZoom = Math.min(optimumKamera.zoom - 0.2, 5.0);
+
+            map.flyTo({
+                center: [targetLng, optimumKamera.center.lat],
+                zoom: finalZoom,
+                pitch: 45,
+                bearing: 0,
+                speed: 1.2,
+                curve: 1,
+                essential: true
+            });
+
+            map.once('moveend', () => {
+                const kart = document.getElementById('hologram-card');
+                document.getElementById('country-name').textContent = seaName;
+                document.getElementById('card-subtitle').textContent = `// BÖLGE: ${seaName.toLocaleUpperCase('tr-TR')} · TÜR: ${seaInfo.type.toLocaleUpperCase('tr-TR')}`;
+                kart.classList.add('show', 'sea-mode');
+
+                const statLabels = document.querySelectorAll('.card-footer .stat-label');
+                if (statLabels[0]) statLabels[0].textContent = 'Tuzluluk (tahmini)';
+                document.getElementById('stat-signal').textContent = `~${seaInfo.salinity} PSU`;
+                document.getElementById('stat-status').textContent = '';
+
+                const seaTemplate = '<span class="prompt">&gt;</span> <span data-text-slot></span><br><br><span data-text-slot></span>';
+                const seaText = [
+                    seaInfo.description,
+                    `Yüzey tuzluluğu yaklaşık ${seaInfo.salinity} PSU’dur. Değer, konum ve mevsime göre değişebilir.`
+                ];
+                daktiloYaz(seaTemplate, seaText, 'country-info', 12);
+            });
+        }
+
+        map.on('click', 'denizler-dolgu', (e) => {
+            if (e.originalEvent) handledMapLayerClicks.add(e.originalEvent);
+            handleSeaSelection(e.features[0], e.lngLat);
+        });
+
+        map.on('click', (e) => {
+            if (e.lngLat.lat < 66) return;
+
+            const originalEvent = e.originalEvent;
+            const clickPoint = e.point;
+            const clickLngLat = e.lngLat;
+
+            setTimeout(() => {
+                if (originalEvent && handledMapLayerClicks.has(originalEvent)) return;
+
+                const existingFeature = map.queryRenderedFeatures(clickPoint, {
+                    layers: ['ulkeler-dolgu', 'denizler-dolgu']
+                })[0];
+                if (existingFeature) return;
+
+                const latitude = clickLngLat.lat;
+                const longitude = clickLngLat.lng;
+                const latMin = Math.max(66, latitude - 5);
+                const latMax = Math.min(85, latitude + 5);
+                const ring = [
+                    [longitude - 5, latMin],
+                    [longitude + 5, latMin],
+                    [longitude + 5, latMax],
+                    [longitude - 5, latMax],
+                    [longitude - 5, latMin]
+                ];
+
+                handleSeaSelection({
+                    properties: {
+                        NAME: 'Arctic Ocean',
+                        NAME_TR: 'Arktik Okyanusu',
+                        featurecla: 'Ocean'
+                    },
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [ring]
+                    }
+                }, clickLngLat);
+            }, 0);
+        });
+
+        // ═══════ CLOSE BUTTON ═══════
+        document.getElementById('card-close').addEventListener('click', resetView);
+
+        // ═══════ SAĞ TIKLAMA → RESET ═══════
+        map.on('contextmenu', (e) => {
+            e.originalEvent.preventDefault();
+            resetView();
+        });
+
+        map.on('dragstart', () => {
+            if (countryOrbitState.active) {
+                pauseCountryOrbit();
+            }
+        });
+
+        map.on('dragend', () => {
+            if (countryOrbitState.active) {
+                resumeCountryOrbit();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.code !== 'Space' || event.repeat) return;
+
+            const target = event.target;
+            if (target instanceof HTMLElement && target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+
+            const canToggleOrbit = countryOrbitState.active || countryOrbitState.paused || spacePausedCountryOrbit;
+            if (!canToggleOrbit || !countryFocusOrbitTarget || !lastFocusedCountryName) return;
+
+            event.preventDefault();
+
+            if (countryOrbitState.active || countryOrbitState.paused) {
+                stopCountryOrbit();
+                spacePausedCountryOrbit = true;
+                map.easeTo({
+                    bearing: 0,
+                    pitch: 0,
+                    duration: 900,
+                    essential: true
+                });
+                return;
+            }
+
+            const selectionToken = countrySelectionToken;
+            const focusedCountry = lastFocusedCountryName;
+            const orbitTarget = countryFocusOrbitTarget;
+            spacePausedCountryOrbit = false;
+
+            map.easeTo({
+                center: orbitTarget.center,
+                zoom: orbitTarget.zoom,
+                bearing: 0,
+                pitch: 45,
+                duration: 900,
+                essential: true
+            });
+            map.once('moveend', () => {
+                if (selectionToken !== countrySelectionToken || lastFocusedCountryName !== focusedCountry || spacePausedCountryOrbit) return;
+                startCountryOrbit(orbitTarget.center, orbitTarget.zoom);
+            });
+        });
+
+        function resetView() {
+            clearInterval(yazmaAnimasyonu);
+            resetCountryFocusState();
+
+            // Ülke seçimlerini sıfırla
+            map.setPaintProperty('diger-ulkeler-karartma', 'fill-opacity', 0.0);
+            map.setFilter('secili-ulke-dolgu', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-dolgu', 'fill-opacity', 0.0);
+
+            map.setPaintProperty('ulkeler-sinir', 'line-opacity', countryBoundaryOpacityByZoom);
+            map.setFilter('secili-ulke-sinir', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-sinir', 'line-opacity', 0.0);
+            map.setFilter('secili-ulke-glow', ['==', 'NAME', '']);
+            map.setPaintProperty('secili-ulke-glow', 'line-opacity', 0.0);
+
+            // Deniz seçimlerini sıfırla
+            map.setFilter('secili-deniz-dolgu', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-dolgu', 'fill-opacity', 0.0);
+            map.setFilter('secili-deniz-sinir', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-sinir', 'line-opacity', 0.0);
+            map.setFilter('secili-deniz-glow', ['==', ['coalesce', ['get', 'NAME_TR'], ['get', 'name_tr'], ['get', 'NAME'], ['get', 'name']], '']);
+            map.setPaintProperty('secili-deniz-glow', 'line-opacity', 0.0);
+
+            map.setPaintProperty('ulkeler-isimler', 'text-opacity', countryLabelOpacityByZoom);
+
+            // Stat etiketlerini varsayılana getir
+            const statLabels = document.querySelectorAll('.card-footer .stat-label');
+            if (statLabels[0]) statLabels[0].textContent = 'Sinyal';
+            if (statLabels[1]) statLabels[1].textContent = 'Tehdit';
+            if (statLabels[2]) statLabels[2].textContent = 'Durum';
+
+            // Seçili tekil etiketi temizle
+            const noktaKaynagi = map.getSource('secili-ulke-nokta');
+            if (noktaKaynagi) {
+                noktaKaynagi.setData({
+                    type: 'FeatureCollection',
+                    features: []
+                });
+            }
+
+            map.flyTo({
+                center: baslangicMerkezi,
+                zoom: baslangicZoom,
+                pitch: 35,
+                bearing: 0,
+                speed: 1.5,
+                curve: 1,
+                essential: true
+            });
+
+            document.getElementById('hologram-card').classList.remove('show', 'sea-mode');
+            setTimeout(() => {
+                document.getElementById('country-info-template').innerHTML = '';
+            }, 600);
         }
