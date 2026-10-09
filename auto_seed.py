@@ -2,6 +2,9 @@ import os, sys, time, requests
 import mysql.connector
 from dotenv import load_dotenv
 import pycountry
+import json
+
+OVERRIDES = json.load(open("overrides.json", encoding="utf-8")) if os.path.exists("overrides.json") else {}
 
 load_dotenv()
 
@@ -13,8 +16,8 @@ CATEGORY_TREE = {
     "Tarih": {
         "Genel Tarih": [("{c} tarihi", ("tarih",))],
         "Tarihi Yapılar ve Antik Kentler": [
-            ("{c} dünya mirası alanları", ("miras",)),
             ("{c} antik kentleri", ("antik", "kent", "kale")),
+            ("{c} tarihi yapıları", ("yapı", "eser", "anıt")),
         ],
     },
     "Coğrafya": {
@@ -37,8 +40,8 @@ CATEGORY_TREE = {
     "Ekonomi": {
         "Genel Ekonomi": [("{c} ekonomisi", ("ekonomi",))],
         "Önemli İhracat ve Endüstri": [
+            ("{c} ihracatı", ("ihracat",)),
             ("{c} sanayisi", ("sanayi", "endüstri")),
-            ("{c} dış ticareti", ("ticaret", "ihracat")),
         ],
     },
 }
