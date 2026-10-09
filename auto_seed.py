@@ -2,6 +2,9 @@ import os, sys, time, requests
 import mysql.connector
 from dotenv import load_dotenv
 import pycountry
+import json
+
+OVERRIDES = json.load(open("overrides.json", encoding="utf-8")) if os.path.exists("overrides.json") else {}
 
 load_dotenv()
 
