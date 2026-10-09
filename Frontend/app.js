@@ -1,4 +1,4 @@
-   // ═══════ PARTICLES ═══════
+       // ═══════ PARTICLES ═══════
         (function createParticles() {
             const container = document.getElementById('particles');
             for (let i = 0; i < 30; i++) {
@@ -89,3 +89,57 @@
         };
         map.on('rotate', updateCompassBearing);
         updateCompassBearing();
+
+        // ═══════ COORDS TRACKING ═══════
+        map.on('mousemove', (e) => {
+            const lat = e.lngLat.lat.toFixed(4);
+            const lng = e.lngLat.lng.toFixed(4);
+            document.getElementById('hud-coords').textContent = `LAT ${lat} · LNG ${lng}`;
+        });
+
+        map.on('style.load', () => {
+
+            // Uzay arka planı
+            map.setFog({
+                'color': '#031429',
+                'high-color': '#031429',
+                'space-color': '#031429',
+                'star-intensity': 0,
+                'horizon-blend': 0.02
+            });
+
+            // 3D Arazi
+            map.addSource('mapbox-dem', {
+                'type': 'raster-dem',
+                'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+                'tileSize': 512,
+                'maxzoom': 14
+            });
+            map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 11.0 });
+
+            map.on('zoom', () => {
+                const zoom = map.getZoom();
+                if (terrainEnabled && zoom >= 6.4) {
+                    terrainEnabled = false;
+                    map.setTerrain(null);
+                } else if (!terrainEnabled && zoom <= 6.2) {
+                    terrainEnabled = true;
+                    map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 11.0 });
+                }
+            });
+
+            // Denizler derin okyanus rengi (Siyah ile mavi tonunun tam ortası - Gece mavisi)
+            map.addSource('mapbox-streets', {
+                type: 'vector',
+                url: 'mapbox://mapbox.mapbox-streets-v8'
+            });
+            map.addLayer({
+                id: 'siyah-denizler',
+                type: 'fill',
+                source: 'mapbox-streets',
+                'source-layer': 'water',
+                paint: {
+                    'fill-color': '#031429',
+                    'fill-opacity': 1
+                }
+            });
